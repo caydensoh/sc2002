@@ -1,7 +1,7 @@
 public class Application {
 
 	private Internship internship;
-	private String status;
+	private String status; //
 	private boolean pending;
 
 	public Internship getInternship() {
@@ -20,6 +20,7 @@ public class Application {
 		return this.status;
 	}
 
+
 	/**
 	 * 
 	 * @param status
@@ -28,8 +29,9 @@ public class Application {
 		this.status = status;
 	}
 
-	public Boolean getPending() {
-		// TODO - implement Application.getPending
+	public Boolean getPending(Boolean) {
+		// TODO - implement Application.getPending, return pending status (to see if application is pending or not)
+		return this.pending;
 		throw new UnsupportedOperationException();
 	}
 
@@ -38,6 +40,8 @@ public class Application {
 	 * @param confirm
 	 */
 	public void setPending(Boolean confirm) {
+		this.pending = confirm ;
+		System.out.println("Pending status set to "+confirm);
 		// TODO - implement Application.setPending
 		throw new UnsupportedOperationException();
 	}

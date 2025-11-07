@@ -5,6 +5,8 @@ public abstract class User {
 	private String password;
 	private filterSetting filterSettings;
 
+	//do we need to add constructiro
+
 	public Boolean login() {
 		// TODO - implement User.login
 		throw new UnsupportedOperationException();
@@ -22,6 +24,7 @@ public abstract class User {
 	 */
 	public Boolean changePassword(String oldPass, String newPass) {
 		// TODO - implement User.changePassword
+		
 		throw new UnsupportedOperationException();
 	}
 
