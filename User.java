@@ -5,7 +5,12 @@ public abstract class User {
 	private String password;
 	private filterSetting filterSettings;
 
-	//do we need to add constructiro
+	//do we need to add constructor 
+	public User(String userID, String name, String password) {
+		this.userID=userID;
+		this.name=name;
+		this.password=password;
+	}
 
 	public Boolean login() {
 		// TODO - implement User.login

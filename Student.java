@@ -5,7 +5,7 @@ public class Student extends User {
 
 	private Integer yearOfStudy;
 	private String major;
-	private List<Application> applications;
+	private List<Application> applicationsList;
 	private Application internship;
 
 	/**
@@ -15,9 +15,9 @@ public class Student extends User {
 	 * @param yearOfStudy
 	 * @param major
 	 */
-	public Student(String userID, String name, Integer yearOfStudy, String major) {
+	public Student(String userID, String name, String password, Integer yearOfStudy, String major) {
 		// TODO - implement Student.Student
-		super(userID,  name);
+		super(userID,  name, password);
 		this.yearOfStudy = yearOfStudy;
 		this.major = major;
 		throw new UnsupportedOperationException();
@@ -48,7 +48,7 @@ public class Student extends User {
 	}
 
 	public List<Application> getApplications() {
-		return this.applications;
+		return this.applicationsList;
 	}
 
 	/**
@@ -57,7 +57,7 @@ public class Student extends User {
 	 */
 	public void addApplication(Application application) {
 		// TODO - implement Student.addApplication
-		this.applications.add(application);
+		this.applicationsList.add(application);
 		throw new UnsupportedOperationException();
 	}
 
@@ -68,7 +68,7 @@ public class Student extends User {
 	 */
 	public Boolean changeApplication(Integer index, Application application) {
 		// TODO - implement Student.changeApplication
-		if (index < 0 || index >= applications.size()) {
+		if (index < 0 || index >= applicationsList.size()) {
 			return false;
 		}
 
@@ -80,11 +80,11 @@ public class Student extends User {
 			return false; //unsuccesful set
 		}
 
-		applications.set(index,opp);
+		applicationsList.set(index,application);
 		return true; //susccesful set
 		
 		
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -93,22 +93,22 @@ public class Student extends User {
 	 */
 	public Boolean deleteApplication(Integer index) {
 		// TODO - implement Student.deleteApplication
-		if (index < 0 || index >= applications.size()) { //data validation
+		if (index < 0 || index >= applicationsList.size()) { //data validation
 			return false;
 		}
 
-		Application app = applications.get(index);
-		//if accepted dont delete
-		if (app.getStatus()=="Successful" || app.getStatus()=="Accepted") {
-			System.out.println("This application has been accepted and cannot be deleted.");
+		Application app = applicationsList.get(index);
+		//if approved dont delete
+		if (app.getStatus()=="Approved") {
+			System.out.println("This application has been approved and can only be withdrawn.");
 			return false;
 		}
 
-		applications.remove(index);
+		applicationsList.remove(index);
 		return true;
 		//applications.remove(index);
 		// need to return boolean?
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 	/**
@@ -117,11 +117,11 @@ public class Student extends User {
 	 */
 	public Boolean acceptInternship(Integer index) {
 		// TODO - implement Student.acceptInternship
-		if (index < 0 || index >= applications.size()) { //data validation
+		if (index < 0 || index >= applicationsList.size()) { //data validation
 			return false;
 		}
 
-		Application selected = applications.get(index);//cannot accept if not succesful
+		Application selected = applicationsList.get(index);//cannot accept if not succesful
 		if (selected.getStatus()!="Successful") {
 			System.out.println("Can only accept applications with 'Successful' status.");
 			return false;
@@ -131,15 +131,15 @@ public class Student extends User {
 		this.internship = selected;
 
 		// withdraw all others
-		for (int i = 0; i < applications.size(); i++) {
+		for (int i = 0; i < applicationsList.size(); i++) {
 			if (i != index) {
-				applications.get(index).setStatus("Withdrawn");
+				applicationsList.get(index).setStatus("Withdrawn");
 			}
 		}
 
 		System.out.println("Internship accepted. Other applications withdrawn.");
 		return true;
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 	public Boolean withdrawInternship() {
@@ -154,7 +154,7 @@ public class Student extends User {
 
 		System.out.println("Your internship has been withdrawn.");
 		return true;
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 }

@@ -1,3 +1,5 @@
+import java.time.*;
+
 public class Internship {
 
 	private String title;
@@ -29,7 +31,17 @@ public class Internship {
 	 */
 	public Internship(String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String status, String companyName, String companyRepIC, Integer slots, boolean visibility) {
 		// TODO - implement Internship.Internship
-		throw new UnsupportedOperationException();
+		this.title=title;
+		this.description=description;
+		this.internshipLevel=internshipLevel;
+		this.preferredMajor=preferredMajor;
+		this.openingDate=openingDate;
+		this.closingDate=closingDate;
+		this.status=status;
+		this.companyName=companyName;
+		this.companyRepIC=companyRepIC;
+		this.slots=slots;
+		this.visibility=visibility;
 	}
 
 	public String getTitle() {

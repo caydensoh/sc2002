@@ -1,3 +1,6 @@
+import java.time.*;
+import java.util.List;
+
 public class filterSetting {
 
 	private String titleKeywords;

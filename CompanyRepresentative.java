@@ -1,9 +1,11 @@
+import java.util.List;
+
 public class CompanyRepresentative extends User {
 
 	private String companyName;
 	private String department;
 	private String position;
-	private List<Internships> internships;
+	private List<Internship> internships;
 	private boolean approval;
 
 	/**
@@ -14,9 +16,13 @@ public class CompanyRepresentative extends User {
 	 * @param department
 	 * @param position
 	 */
-	public CompanyRepresentative(String userID, String name, String companyName, String department, String position) {
+	public CompanyRepresentative(String userID, String name, String password, String companyName, String department, String position) {
 		// TODO - implement CompanyRepresentative.CompanyRepresentative
-		throw new UnsupportedOperationException();
+		super(userID, name, password);
+		this.companyName=companyName;
+		this.department=department;
+		this.position=position;
+		//throw new UnsupportedOperationException();
 	}
 
 	public String getDepartment() {
@@ -43,7 +49,7 @@ public class CompanyRepresentative extends User {
 		this.position = Position;
 	}
 
-	public List<Internships> getInternships() {
+	public List<Internship> getInternships() {
 		return this.internships;
 	}
 
@@ -51,8 +57,10 @@ public class CompanyRepresentative extends User {
 	 * 
 	 * @param internship
 	 */
-	public void addInternships(Internships internship) {
+	public void addInternships(Internship internship) {
 		// TODO - implement CompanyRepresentative.addInternships
+
+
 		throw new UnsupportedOperationException();
 	}
 

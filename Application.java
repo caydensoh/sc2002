@@ -1,7 +1,7 @@
 public class Application {
 
 	private Internship internship;
-	private String status; //
+	private String status; //Pending, Approved, Rejected, Filled
 	private boolean pending;
 
 	public Internship getInternship() {
@@ -29,10 +29,10 @@ public class Application {
 		this.status = status;
 	}
 
-	public Boolean getPending(Boolean) {
+	public Boolean getPending() {
 		// TODO - implement Application.getPending, return pending status (to see if application is pending or not)
 		return this.pending;
-		throw new UnsupportedOperationException();
+		//throw new UnsupportedOperationException();
 	}
 
 	/**
