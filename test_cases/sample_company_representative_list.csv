@@ -1,1 +1,2 @@
-CompanyRepID,Name,CompanyName,Department,Position,Email,Status
+CompanyRepID, Name, CompanyName, Department, Position
+A12345, Brandon Lee, Google, Marketing, Manager

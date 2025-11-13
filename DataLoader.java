@@ -52,10 +52,10 @@ public class DataLoader {
         List<String[]> data = readCSV(filePath);
 
         for (String[] fields : data) {
-            if (fields.length >= 4) {
+            if (fields.length >= 3) {
                 String userID = fields[0].trim();
                 String name = fields[1].trim();
-                String staffDepartment = fields[3].trim();
+                String staffDepartment = fields[2].trim();
                 String defaultPassword = "password";
 
                 CareerCenterStaff staff = new CareerCenterStaff(userID, name, defaultPassword, staffDepartment);
@@ -71,12 +71,12 @@ public class DataLoader {
         List<String[]> data = readCSV(filePath);
 
         for (String[] fields : data) {
-            if (fields.length >= 6) {
+            if (fields.length >= 5) {
                 String userID = fields[0].trim();
                 String name = fields[1].trim();
-                String companyName = fields[3].trim();
-                String department = fields[4].trim();
-                String position = fields[5].trim();
+                String companyName = fields[2].trim();
+                String department = fields[3].trim();
+                String position = fields[4].trim();
                 String defaultPassword = "password";
 
                 CompanyRepresentative rep = new CompanyRepresentative(userID, name, defaultPassword, companyName, department, position);
