@@ -97,11 +97,11 @@ public class UserApp {
 				if (choice.equals("0")) {
 					running = false;
 				}
-			} else if (activeUser instanceof CarrerCenterStaff) {
-				StaffMenu.displayOptions((CarrerCenterStaff) activeUser);
+			} else if (activeUser instanceof CareerCenterStaff) {
+				StaffMenu.displayOptions((CareerCenterStaff) activeUser);
 				System.out.print("Enter your choice: ");
 				String choice = scanner.nextLine().trim();
-				StaffMenu.handleChoice((CarrerCenterStaff) activeUser, choice);
+				StaffMenu.handleChoice((CareerCenterStaff) activeUser, choice);
 				if (choice.equals("0")) {
 					running = false;
 				}

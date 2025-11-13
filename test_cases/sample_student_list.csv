@@ -1,6 +1,27 @@
-StudentID, Name, Major, Year
-U2310001A, Tan Wei Ling, Computer Science, 2
-U2310002B, Ng Jia Hao, Data Science & AI, 3
-U2310003C, Lim Yi Xuan, Computer Engineering, 4
-U2310004D, Chong Zhi Hao, Information Engineering & Media, 1
-U2310005E, Wong Shu Hui, Computer Science, 3
+StudentID,Name,Major,Year,Email,Password,ApplicationIDs,AcceptedInternshipID
+S001,Alice Johnson,Computer Science,2,,pache,924176d6-86d4-446e-951c-e3c8be377f86,
+S002,Bob Smith,Software Engineering,3,,welcome2025,,
+S003,Carol White,Information Technology,1,,student001,,
+S004,David Lee,Computer Science,4,,dev2024,,
+S005,Emma Davis,Software Engineering,2,,pass@2025,,
+S006,Frank Wilson,Information Technology,3,,intern123,,
+S007,Grace Chen,Computer Science,1,,secure456,,
+S008,Henry Brown,Software Engineering,4,,code789,,
+S009,Iris Rodriguez,Information Technology,2,,tech2025,,
+S010,Jack Martinez,Computer Science,3,,java123,,
+S011,Karen Anderson,Software Engineering,1,,web2024,,
+S012,Leo Taylor,Information Technology,4,,data456,,
+S013,Mia Thomas,Computer Science,2,,sql789,,
+S014,Noah Jackson,Software Engineering,3,,python123,,
+S015,Olivia White,Information Technology,1,,net456,,
+S016,Paul Harris,Computer Science,4,,cpp789,,
+S017,Quinn Lewis,Software Engineering,2,,js2024,,
+S018,Rachel Walker,Information Technology,3,,db123,,
+S019,Sam Young,Computer Science,1,,rust456,,
+S020,Tina Hall,Software Engineering,4,,go789,,
+S021,Uma Hernandez,Information Technology,2,,rust2024,,
+S022,Victor King,Computer Science,3,,swift123,,
+S023,Wendy Wright,Software Engineering,1,,kotlin456,,
+S024,Xavier Lopez,Information Technology,4,,scala789,,
+S025,Yasmine Moore,Computer Science,2,,elixir2024,,
+S026,Zack Clark,Software Engineering,3,,haskell123,,

@@ -7,10 +7,10 @@ import java.util.*;
  * Handles all CSV file I/O operations for users, internships, and applications.
  */
 public class DataManager {
-	private static final String USERS_CSV_PATH = "sample_student_list.csv";
-	private static final String INTERNSHIPS_CSV_PATH = "internships.csv";
-	private static final String APPLICATIONS_CSV_PATH = "applications.csv";
-    private static final String FILTERS_CSV_PATH = "filter_settings.csv";
+	private static final String USERS_CSV_PATH = "test_cases/sample_student_list.csv";
+	private static final String INTERNSHIPS_CSV_PATH = "test_cases/internships.csv";
+	private static final String APPLICATIONS_CSV_PATH = "test_cases/applications.csv";
+    private static final String FILTERS_CSV_PATH = "test_cases/filter_settings.csv";
 
 	/**
 	 * Load all data from CSV files
@@ -87,9 +87,8 @@ public class DataManager {
 	}
 
 	private static void saveFilterSettings(List<User> users) {
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("StudentID,TitleKeywords,DescriptionKeywords,InternshipLevels,PreferredMajors,Status,CompanyName,Avaliable,Visibility\n");
+		try (FileWriter fw = new FileWriter(FILTERS_CSV_PATH)) {
+			fw.write("StudentID,TitleKeywords,DescriptionKeywords,InternshipLevels,PreferredMajors,Status,CompanyName,Avaliable,Visibility\n");
 			for (User u : users) {
 				if (u instanceof Student s) {
 					FilterSetting fs = s.getFilterSettings();
@@ -106,10 +105,9 @@ public class DataManager {
 						fs.getAvailable() == true ? "true" : fs.getAvailable().toString(),
 						fs.getVisibility() == null ? "true" : fs.getVisibility().toString()
 					);
-					sb.append(line);
+					fw.write(line);
 				}
 			}
-			Files.write(Paths.get(FILTERS_CSV_PATH), sb.toString().getBytes());
 		} catch (IOException e) {
 			System.out.println("Error writing filter settings: " + e.getMessage());
 		}
@@ -197,9 +195,8 @@ public class DataManager {
 	}
 
 	private static void saveUsersToCSV(List<User> users) {
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("StudentID,Name,Major,Year,Email,Password,ApplicationIDs,AcceptedInternshipID\n");
+		try (FileWriter fw = new FileWriter(USERS_CSV_PATH)) {
+			fw.write("StudentID,Name,Major,Year,Email,Password,ApplicationIDs,AcceptedInternshipID\n");
 
 			for (User user : users) {
 				if (user instanceof Student s) {
@@ -225,11 +222,9 @@ public class DataManager {
 				String line = String.format("%s,%s,%s,%d,%s,%s,%s,%s\n",
 					s.getUserID(), s.getName(), s.getMajor(), s.getYearOfStudy(),
 					"", s.getPassword(), appIDsBuilder.toString(), acceptedInternshipID);
-				sb.append(line);
+				fw.write(line);
 				}
 			}
-
-			Files.write(Paths.get(USERS_CSV_PATH), sb.toString().getBytes());
 			System.out.println("Users saved.");
 		} catch (IOException e) {
 			System.out.println("Error writing users CSV: " + e.getMessage());
@@ -284,9 +279,8 @@ public class DataManager {
 	}
 
 	private static void saveInternshipsToCSV(List<Internship> allInternships) {
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("InternshipID,Title,Description,Level,PreferredMajor,OpeningDate,ClosingDate,Status,CompanyName,CompanyRepIC,Slots,Visibility\n");
+		try (FileWriter fw = new FileWriter(INTERNSHIPS_CSV_PATH)) {
+			fw.write("InternshipID,Title,Description,Level,PreferredMajor,OpeningDate,ClosingDate,Status,CompanyName,CompanyRepIC,Slots,Visibility\n");
 
 			for (Internship intern : allInternships) {
 				String line = String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%d,%s\n",
@@ -295,10 +289,9 @@ public class DataManager {
 					intern.getPreferredMajor(), intern.getOpeningDate(), intern.getClosingDate(),
 					intern.getStatus(), intern.getCompanyName(), intern.getCompanyRepIC(),
 					intern.getSlots(), intern.getVisibility());
-				sb.append(line);
+				fw.write(line);
 			}
 
-			Files.write(Paths.get(INTERNSHIPS_CSV_PATH), sb.toString().getBytes());
 			System.out.println("Internships saved.");
 		} catch (IOException e) {
 			System.out.println("Error writing internships CSV: " + e.getMessage());
@@ -353,17 +346,15 @@ public class DataManager {
 	}
 
 	private static void saveApplicationsToCSV(List<Application> allApplications) {
-		try {
-			StringBuilder sb = new StringBuilder();
-			sb.append("ApplicationID,InternshipID,Status\n");
+		try (FileWriter fw = new FileWriter(APPLICATIONS_CSV_PATH)) {
+			fw.write("ApplicationID,InternshipID,Status\n");
 
 			for (Application app : allApplications) {
 				String line = String.format("%s,%s,%s\n",
 					app.getApplicationID(), app.getInternship().getInternshipID(), app.getStatus());
-				sb.append(line);
+				fw.write(line);
 			}
 
-			Files.write(Paths.get(APPLICATIONS_CSV_PATH), sb.toString().getBytes());
 			System.out.println("Applications saved.");
 		} catch (IOException e) {
 			System.out.println("Error writing applications CSV: " + e.getMessage());

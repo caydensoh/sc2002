@@ -1,13 +1,12 @@
-import java.util.*;
 
 public class StaffMenu extends Menu {
-    private CarrerCenterStaff staff;
+    private CareerCenterStaff staff;
 
-    public StaffMenu(CarrerCenterStaff s) {
+    public StaffMenu(CareerCenterStaff s) {
         this.staff = s;
     }
 
-    public static void displayOptions(CarrerCenterStaff s) {
+    public static void displayOptions(CareerCenterStaff s) {
         System.out.println("\n========== Internship Management System (Staff) ==========");
         System.out.println("Logged in as: " + s.getName() + " (" + s.getUserID() + ")");
         System.out.println("1: View my profile");
@@ -18,7 +17,7 @@ public class StaffMenu extends Menu {
         System.out.println("====================================================");
     }
 
-    public static void handleChoice(CarrerCenterStaff s, String choice) {
+    public static void handleChoice(CareerCenterStaff s, String choice) {
         StaffMenu menu = new StaffMenu(s);
         menu.handleChoice(choice);
     }
