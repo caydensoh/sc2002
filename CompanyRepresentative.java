@@ -1,9 +1,8 @@
 import java.util.List;
-import java.util.Scanner;
 
 public class CompanyRepresentative extends User {
 
-	private String companyName;
+	final private String companyName;
 	private String department;
 	private String position;
 	private List<Internship> internships;
@@ -18,12 +17,12 @@ public class CompanyRepresentative extends User {
 	 * @param position
 	 */
 	public CompanyRepresentative(String userID, String name, String password, String companyName, String department, String position) {
-		// TODO - implement CompanyRepresentative.CompanyRepresentative
 		super(userID, name, password);
 		this.companyName=companyName;
 		this.department=department;
 		this.position=position;
-		//throw new UnsupportedOperationException();
+		this.internships = new java.util.ArrayList<>();
+		this.approval = false;
 	}
 
 	public String getDepartment() {
@@ -54,147 +53,48 @@ public class CompanyRepresentative extends User {
 		return this.internships;
 	}
 
-	/**
-	 * 
-	 * @param internship
-	 */
-	public void addInternships(Internship internship) {
-		// TODO - implement CompanyRepresentative.addInternships
-		//if lenght >= 5, cannot add anymore internship
-		if (internships.size() >= 5) {
-            System.out.println("You have already reached the maximum of 5 internships.");
-            return;
-        }
-        // auto assign company name
-        internship.setCompanyName(this.companyName); 
-        internships.add(internship); 
-
-		throw new UnsupportedOperationException();
+	public String getCompanyName() {
+		return this.companyName;
 	}
 
 	/**
 	 * 
-	 * @param index
-	 * @param application
+	 * @param internship
 	 */
-	public Boolean updateInternship(Integer index, Internship internship) {
-		// TODO - implement CompanyRepresentative.changeInternship
-		if (index < 0 || index >= internships.size()) {
-			System.out.println("Internship not found.");
+	public boolean addInternships(Internship internship) {
+		//if length >= 5, cannot add anymore internship
+		if (this.internships.size() >= 5) {
+            System.out.println("You have already reached the maximum of 5 internships.");
             return false;
         }
-         Internship target = internships.get(index); 
-
-		// Only allow editing if status is "Pending" (before approval)
-		if (!target.getStatus().equals("Pending")) {
-			System.out.println("Cannot update internship after it has been approved/rejected/filled.");
-			return false;
-		}
-
-		Scanner scanner = new Scanner(System.in);
-		boolean editing = true;
-
-		while (editing) {
-			System.out.println("\n--- Update Internship Menu ---");
-			System.out.println("1: Update Title");
-			System.out.println("2: Update Description");
-			System.out.println("3: Update Level (Basic/Intermediate/Advanced)");
-			System.out.println("4: Update Preferred Major");
-			System.out.println("5: Update Opening Date (YYYY-MM-DD)");
-			System.out.println("6: Update Closing Date (YYYY-MM-DD)");
-			System.out.println("7: Update Number of Slots (max 10)");
-			System.out.println("8: Toggle Visibility");
-			System.out.println("0: Save and Exit");
-			System.out.print("Enter your choice: ");
-
-			int choice = scanner.nextInt();
-			scanner.nextLine(); // consume newline
-
-			switch (choice) {
-				case 1:
-					System.out.print("Enter new title: ");
-					target.setTitle(scanner.nextLine());
-					break;
-				case 2:
-					System.out.print("Enter new description: ");
-					target.setDescription(scanner.nextLine());
-					break;
-				case 3:
-					System.out.print("Enter new level (Basic/Intermediate/Advanced): ");
-					String level = scanner.nextLine();
-					if (level.equals("Basic") || level.equals("Intermediate") || level.equals("Advanced")) {
-						target.setInternshipLevel(level);
-					} else {
-						System.out.println("Invalid level. No change made.");
-					}
-					break;
-				case 4:
-					System.out.print("Enter new preferred major (e.g., CSC, EEE): ");
-					target.setPreferredMajor(scanner.nextLine());
-					break;
-				case 5:
-					System.out.print("Enter new opening date (YYYY-MM-DD): ");
-					target.setOpeningDate(scanner.nextInt());
-					break;
-				case 6:
-					System.out.print("Enter new closing date (YYYY-MM-DD): ");
-					target.setClosingDate(scanner.nextInt());
-					break;
-				case 7:
-					System.out.print("Enter number of slots (1-10): ");
-					int slots = scanner.nextInt();
-					if (slots >= 1 && slots <= 10) {
-						target.setSlots(slots);
-					} else {
-						System.out.println("Invalid number of slots. Must be between 1 and 10.");
-					}
-					scanner.nextLine(); // consume newline
-					break;
-				case 8:
-					target.setVisibility(!target.getVisibility());
-					System.out.println("Visibility toggled to " + (target.getVisibility() ? "ON" : "OFF"));
-					break;
-				case 0:
-					editing = false;
-					System.out.println("Updates saved.");
-					break;
-				default:
-					System.out.println("Invalid choice. Try again.");
-			}
-
-		}
-			return true;
-			//throw new UnsupportedOperationException();
-	}	
+        // auto assign company name
+        internship.setCompanyName(this.companyName); 
+        this.internships.add(internship);
+        return true;
+	}
 
 	/**
-	 * 
+	 * Delete an internship by index
 	 * @param index
 	 */
-	public Boolean deleteInternship(Integer index) {
-		// TODO - implement CompanyRepresentative.deleteInternship
+	public boolean deleteInternship(Integer index) {
 		if (index < 0 || index >= internships.size()) {
             return false;
         }
         internships.remove(index.intValue());
         return true;
-		//throw new UnsupportedOperationException();
 	}
 
-	public Boolean getApproval() {
-		// TODO - implement CompanyRepresentative.getApproval
+	public boolean getApproval() {
 		return this.approval;
-		//throw new UnsupportedOperationException();
 	}
 
 	/**
 	 * 
 	 * @param approval
 	 */
-	public void setApproval(Boolean approval) { //idk if they are allowed to do this??
-		// TODO - implement CompanyRepresentative.setApproval 
+	public void setApproval(boolean approval) {
 		this.approval = approval;
-		throw new UnsupportedOperationException();
 	}
 
 }

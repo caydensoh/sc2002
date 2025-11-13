@@ -1,0 +1,27 @@
+InternshipID,Title,Description,Level,PreferredMajor,OpeningDate,ClosingDate,Status,CompanyName,CompanyRepIC,Slots,Visibility
+INT001,Java Developer Intern,Build backend services in Java,Intermediate,Computer Science,2025-01-15,2025-02-15,Approved,TechCorp,C001,3,true
+INT002,Frontend Developer,React and Vue development,Basic,Software Engineering,2025-01-10,2025-02-20,Approved,WebSolutions,C002,2,true
+INT003,Data Analyst Intern,Work with big data technologies,Advanced,Information Technology,2025-02-01,2025-03-01,Pending,DataWorks,C003,1,false
+INT004,Python Backend Engineer,Django/FastAPI backend development,Intermediate,Computer Science,2025-01-20,2025-03-01,Approved,CloudInnovate,C004,4,true
+INT005,Mobile App Developer,iOS and Android development,Advanced,Software Engineering,2025-02-01,2025-03-15,Approved,AppStudio,C005,2,true
+INT006,Database Administrator,SQL Server and NoSQL management,Intermediate,Information Technology,2025-01-25,2025-02-28,Approved,DataCorp,C006,3,true
+INT007,DevOps Engineer,Docker and Kubernetes deployment,Advanced,Computer Science,2025-02-10,2025-03-20,Pending,OpsClouds,C007,1,true
+INT008,UI/UX Designer,User interface and experience design,Basic,Software Engineering,2025-01-18,2025-02-25,Approved,DesignHub,C008,3,false
+INT009,Cloud Solutions Architect,AWS and Azure cloud design,Advanced,Information Technology,2025-02-15,2025-04-01,Approved,CloudSys,C009,2,true
+INT010,Machine Learning Engineer,AI and ML model development,Advanced,Computer Science,2025-02-20,2025-03-30,Approved,AITech,C010,2,true
+INT011,Quality Assurance Tester,Software testing and automation,Basic,Software Engineering,2025-01-22,2025-02-28,Approved,QALabs,C011,5,true
+INT012,Systems Administrator,Network and server management,Intermediate,Information Technology,2025-01-30,2025-03-10,Approved,NetWorks,C012,2,false
+INT013,Full Stack Developer,MERN stack development,Intermediate,Software Engineering,2025-02-05,2025-03-25,Approved,WebTech,C013,3,true
+INT014,Cybersecurity Analyst,Security threat analysis and response,Advanced,Information Technology,2025-02-12,2025-03-28,Pending,SecureNet,C014,1,true
+INT015,Business Analyst,Requirements gathering and analysis,Basic,Computer Science,2025-01-28,2025-03-05,Approved,ConultCorp,C015,4,true
+INT016,API Developer,RESTful API design and implementation,Intermediate,Software Engineering,2025-02-08,2025-03-20,Approved,APIForce,C016,2,true
+INT017,Game Developer,Unity and Unreal game development,Advanced,Computer Science,2025-02-18,2025-04-10,Approved,GameStudio,C017,2,true
+INT018,Data Engineer,ETL pipeline development,Intermediate,Information Technology,2025-01-25,2025-03-15,Approved,DataPipe,C018,3,true
+INT019,IT Support Specialist,Technical support and troubleshooting,Basic,Information Technology,2025-02-01,2025-02-28,Approved,TechSupport,C019,6,true
+INT020,Blockchain Developer,Smart contract development,Advanced,Computer Science,2025-02-22,2025-04-15,Pending,BlockChain,C020,1,false
+INT021,Solutions Engineer,Customer technical solutions,Intermediate,Software Engineering,2025-02-14,2025-03-30,Approved,SolTech,C021,2,true
+INT022,Network Engineer,Network infrastructure design,Intermediate,Information Technology,2025-02-10,2025-03-25,Approved,NetDesign,C022,3,true
+INT023,Software Architect,Software system design and planning,Advanced,Computer Science,2025-02-25,2025-04-20,Approved,ArchCorp,C023,1,true
+INT024,Research Scientist,Applied research and development,Advanced,Software Engineering,2025-03-01,2025-04-30,Pending,ResearchLab,C024,2,false
+INT025,Technical Writer,Documentation and technical content,Basic,Information Technology,2025-02-03,2025-03-15,Approved,DocWrite,C025,4,true
+INT026,DevSecOps Engineer,Security and operations integration,Advanced,Computer Science,2025-02-28,2025-04-25,Approved,SecOps,C026,1,true

@@ -1,35 +1,36 @@
 public abstract class User {
 
-	private String userID;
+	final private String userID;
 	private String name;
 	private String password;
-	private filterSetting filterSettings;
-	private boolean isLoggedIn = false; 
+	private FilterSetting FilterSettings;
 
 	
 	public User(String userID, String name, String password) {
 		this.userID=userID;
 		this.name=name;
-		this.password=password; // passwrod is password by default
+		this.password= (password == null)? "password" : password; // password is password by default
 	}
 
-	public Boolean login(String in) { //need to update class diagram
-		// TODO - implement User.login
-		if (in == this.password){
-			isLoggedIn = true;
+	public String getUserID() {
+		return this.userID;
+	}
+
+	public String getName() {
+		return this.name;
+	}
+
+	public String getPassword() {
+		return this.password;
+	}
+
+	public boolean login(String password) {
+		if (password.equals(this.password)){
 			System.out.println("You are now logged in.");
 			return true;
 		}
 		System.out.println("Wrong password. Please try again.");
-		
-		throw new UnsupportedOperationException();
-	}
-
-	public void logout() {
-		// TODO - implement User.logout
-		isLoggedIn = false;
-		System.out.println("You are now logged out.");
-		throw new UnsupportedOperationException();
+		return false;
 	}
 
 	/**
@@ -37,17 +38,26 @@ public abstract class User {
 	 * @param oldPass
 	 * @param newPass
 	 */
-	public Boolean changePassword(String oldPass, String newPass) {
-		// TODO - implement User.changePassword
-		if (this.password == oldPass){
+	public boolean changePassword(String oldPass, String newPass) {
+		if (this.password.equals(oldPass)){
 			this.password = newPass;
-			System.out.println("Password succesfully updated.");
-		}else if (this.password != oldPass){
-			System.out.println("Wrong password. Please  try again.");
+			System.out.println("Password successfully updated.");
+			return true;
+		}else {
+			System.out.println("Wrong password. Please try again.");
+			return false;
 		}
+	}
 
-		
-		throw new UnsupportedOperationException();
+	public FilterSetting getFilterSettings() {
+		if (this.FilterSettings == null) {
+			this.FilterSettings = new FilterSetting(null, null, null, null, null, null, false, false);
+		}
+		return this.FilterSettings;
+	}
+
+	public void setFilterSettings(FilterSetting filterSettings) {
+		this.FilterSettings = filterSettings;
 	}
 
 }

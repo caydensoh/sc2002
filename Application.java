@@ -1,19 +1,28 @@
 public class Application {
-
+	private String applicationID;
 	private Internship internship;
-	private String status; //Pending, Approved, Rejected, Filled
-	private boolean pending;
+	private String status; //Pending, Successful, Unsuccessful
+
+	public Application(Internship internship) {
+		// TODO - implement Application.Application
+		this.applicationID = java.util.UUID.randomUUID().toString();
+		this.internship = internship;
+		this.status = "Pending";
+	}
+
+	public Application(String applicationID, Internship internship) {
+		// Constructor for loading from CSV with existing ID
+		this.applicationID = applicationID;
+		this.internship = internship;
+		this.status = "Pending";
+	}
+
+	public String getApplicationID() {
+		return this.applicationID;
+	}
 
 	public Internship getInternship() {
 		return this.internship;
-	}
-
-	/**
-	 * 
-	 * @param internship
-	 */
-	public void setInternship(Internship internship) {
-		this.internship = internship;
 	}
 
 	public String getStatus() {
@@ -28,22 +37,4 @@ public class Application {
 	public void setStatus(String status) {
 		this.status = status;
 	}
-
-	public Boolean getPending() {
-		// TODO - implement Application.getPending, return pending status (to see if application is pending or not)
-		return this.pending;
-		//throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param confirm
-	 */
-	public void setPending(Boolean confirm) {
-		this.pending = confirm ;
-		System.out.println("Pending status set to "+confirm);
-		// TODO - implement Application.setPending
-		throw new UnsupportedOperationException();
-	}
-
 }

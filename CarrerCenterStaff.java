@@ -1,18 +1,18 @@
 public class CarrerCenterStaff extends User {
 
-	private String staffDepartment;  //only attribute
+	private String staffDepartment;
 
 	/**
 	 * 
-	 * @param userID from User class
-	 * @param name from User class
-	 * @param staffDepartment from User class
+	 * @param userID 
+	 * @param name 
+	 * @param password 
+	 * @param staffDepartment 
 	 */
-	public CarrerCenterStaff(String userID, String name, String staffDepartment) {//constructor
+	public CarrerCenterStaff(String userID, String name, String password, String staffDepartment) {//constructor
 		// TODO - implement CarrerCenterStaff.CarrerCenterStaff
-		super(userID, name, "password");
+		super(userID, name, password);
 		this.staffDepartment = staffDepartment;
-		throw new UnsupportedOperationException();
 	}
 
 	public String getStaffDepartment() {
@@ -26,5 +26,5 @@ public class CarrerCenterStaff extends User {
 	public void setStaffDepartment(String staffDepartment) {
 		this.staffDepartment = staffDepartment;
 	}
-
+	
 }

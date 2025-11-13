@@ -1,7 +1,7 @@
 import java.time.*;
 
 public class Internship {
-
+	private String internshipID;
 	private String title;
 	private String description;
 	private String internshipLevel;
@@ -12,11 +12,10 @@ public class Internship {
 	private String companyName;
 	private String companyRepIC;
 	private Integer slots;
-	private Boolean visibility;
-	private Boolean approval;
+	private boolean visibility;
 
 	/**
-	 * 
+	 * @param internshipId
 	 * @param title
 	 * @param description
 	 * @param internshipLevel
@@ -29,21 +28,30 @@ public class Internship {
 	 * @param slots
 	 * @param visibility
 	 */
-	public Internship(String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String status, String companyName, String companyRepIC, Integer slots, boolean visibility) {
+	public Internship(String internshipId, String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
 		// TODO - implement Internship.Internship
+		this.internshipID = internshipId == null? java.util.UUID.randomUUID().toString():internshipId;
 		this.title=title;
 		this.description=description;
 		this.internshipLevel=internshipLevel;
 		this.preferredMajor=preferredMajor;
 		this.openingDate=openingDate;
 		this.closingDate=closingDate;
-		this.status=status;
+		this.status="Pending";
 		this.companyName=companyName;
 		this.companyRepIC=companyRepIC;
 		this.slots=slots;
-		this.visibility=visibility;
+		this.visibility=false;
 	}
 
+	public String getInternshipID() {
+		return this.internshipID;
+	}
+
+	public void setInternshipID(String internshipID) {
+		this.internshipID = internshipID;
+	}
+	
 	public String getTitle() {
 		return this.title;
 	}
@@ -164,7 +172,7 @@ public class Internship {
 		this.slots = slots;
 	}
 
-	public Boolean getVisibility() {
+	public boolean getVisibility() {
 		return this.visibility;
 	}
 
@@ -172,20 +180,7 @@ public class Internship {
 	 * 
 	 * @param visibility
 	 */
-	public void setVisibility(Boolean visibility) {
+	public void setVisibility(boolean visibility) {
 		this.visibility = visibility;
 	}
-
-	public Boolean getApproval() {
-		return this.approval;
-	}
-
-	/**
-	 * 
-	 * @param approval
-	 */
-	public void setApproval(Boolean approval) {
-		this.approval = approval;
-	}
-
 }

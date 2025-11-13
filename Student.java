@@ -15,12 +15,30 @@ public class Student extends User {
 	 * @param yearOfStudy
 	 * @param major
 	 */
-	public Student(String userID, String name, String password, Integer yearOfStudy, String major) {
-		// TODO - implement Student.Student
-		super(userID,  name, password);
+	public Student(String userID, String name, String password, Integer yearOfStudy, String major, FilterSetting filterSettings) {
+		super(userID, name, password);
 		this.yearOfStudy = yearOfStudy;
 		this.major = major;
-		throw new UnsupportedOperationException();
+		this.applicationsList = new ArrayList<>();
+		this.internship = null;
+		if (filterSettings != null) {
+			this.setFilterSettings(filterSettings);
+		}
+		else {
+			List<String> allowedLevels = new ArrayList<>();
+			List<String> majors = new ArrayList<>();
+			majors.add(this.major);
+			if (this.yearOfStudy != null && this.yearOfStudy <= 2) {
+				allowedLevels.add("Basic");
+			} else {
+				// years 3+ see all levels
+				allowedLevels.add("Basic");
+				allowedLevels.add("Intermediate");
+				allowedLevels.add("Advanced");
+			}
+			FilterSetting fs = new FilterSetting(null, null, allowedLevels, majors, null, null, true, true);
+			this.setFilterSettings(fs);
+		}
 	}
 
 	public Integer getYearOfStudy() {
@@ -51,110 +69,78 @@ public class Student extends User {
 		return this.applicationsList;
 	}
 
-	/**
-	 * 
-	 * @param application
-	 */
-	public void addApplication(Application application) {
-		// TODO - implement Student.addApplication
-		this.applicationsList.add(application);
-		throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param index
-	 * @param application
-	 */
-	public Boolean changeApplication(Integer index, Application application) {
-		// TODO - implement Student.changeApplication
-		if (index < 0 || index >= applicationsList.size()) {
+	public boolean addApplication(Application application) {
+		// Check max applications limit
+		if (this.applicationsList.size() >= 3) {
+			System.out.println("You have reached the maximum of 3 applications. Please remove an application to apply for more.");
 			return false;
 		}
-
-		Internship opp = application.getInternship();
-
-		//check eligibility
-		if (yearOfStudy <= 2 && opp.getInternshipLevel()!="Basic") {
+		if (this.yearOfStudy <= 2 && !"Basic".equals(application.getInternship().getInternshipLevel())) {
 			System.out.println("Not eligible for this internship level. Level is too high for Year 1 and 2 students.");
-			return false; //unsuccesful set
-		}
-
-		applicationsList.set(index,application);
-		return true; //susccesful set
-		
-		
-		//throw new UnsupportedOperationException();
-	}
-
-	/**
-	 * 
-	 * @param index
-	 */
-	public Boolean deleteApplication(Integer index) {
-		// TODO - implement Student.deleteApplication
-		if (index < 0 || index >= applicationsList.size()) { //data validation
 			return false;
 		}
-
-		Application app = applicationsList.get(index);
-		//if approved dont delete
-		if (app.getStatus()=="Approved") {
-			System.out.println("This application has been approved and can only be withdrawn.");
-			return false;
-		}
-
-		applicationsList.remove(index);
+		this.applicationsList.add(application);
 		return true;
-		//applications.remove(index);
-		// need to return boolean?
-		//throw new UnsupportedOperationException();
+	}
+
+	/**
+	 * Remove an application by index
+	 * @param index
+	 */
+	public boolean removeApplication(Integer index) {
+		if (index < 0 || index >= this.applicationsList.size()) {
+			return false;
+		}
+		Application app = this.applicationsList.get(index);
+		applicationsList.remove(app);
+		return true;
 	}
 
 	/**
 	 * 
 	 * @param index
 	 */
-	public Boolean acceptInternship(Integer index) {
-		// TODO - implement Student.acceptInternship
-		if (index < 0 || index >= applicationsList.size()) { //data validation
+	public boolean acceptInternship(Integer index) {
+		if (index < 0 || index >= this.applicationsList.size()) {
 			return false;
 		}
 
-		Application selected = applicationsList.get(index);//cannot accept if not succesful
-		if (selected.getStatus()!="Successful") {
+		Application selected = this.applicationsList.get(index);
+		if (!"Successful".equals(selected.getStatus())) {
 			System.out.println("Can only accept applications with 'Successful' status.");
 			return false;
 		}
-		// accept if succesful status
+		// accept if successful status
 		selected.setStatus("Accepted");
 		this.internship = selected;
 
-		// withdraw all others
-		for (int i = 0; i < applicationsList.size(); i++) {
-			if (i != index) {
-				applicationsList.get(index).setStatus("Withdrawn");
-			}
-		}
+		// withdraw all others by creating a new list
+		List<Application> remaining = new ArrayList<>();
+		remaining.add(selected);
+		this.applicationsList = remaining;
 
 		System.out.println("Internship accepted. Other applications withdrawn.");
 		return true;
-		//throw new UnsupportedOperationException();
 	}
 
-	public Boolean withdrawInternship() {
-		// TODO - implement Student.withdrawInternship
+	public boolean withdrawInternship() {
 		if (this.internship == null) {
 			System.out.println("No accepted internship to withdraw.");
 			return false;
 		}
 
-		this.internship.setStatus("Withdrawn");
 		this.internship = null;
 
 		System.out.println("Your internship has been withdrawn.");
 		return true;
-		//throw new UnsupportedOperationException();
+	}
+
+	public Application getAcceptedInternship() {
+		return this.internship;
+	}
+
+	public void setAcceptedInternship(Application internship) {
+		this.internship = internship;
 	}
 
 }
