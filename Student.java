@@ -16,11 +16,10 @@ public class Student extends User {
 	 * @param major
 	 */
 	public Student(String userID, String name, String password, Integer yearOfStudy, String major) {
-		// TODO - implement Student.Student
 		super(userID,  name, password);
 		this.yearOfStudy = yearOfStudy;
 		this.major = major;
-		throw new UnsupportedOperationException();
+		
 	}
 
 	public Integer getYearOfStudy() {

@@ -10,7 +10,7 @@ public abstract class User {
 	public User(String userID, String name, String password) {
 		this.userID=userID;
 		this.name=name;
-		this.password=password; // passwrod is password by default
+		this.password=password; // password is password by default
 	}
 
 	public Boolean login(String in) { //need to update class diagram
