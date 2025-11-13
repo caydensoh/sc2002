@@ -1,6 +1,7 @@
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
+import java.time.LocalDate;
 
 public class CompanyRepresentative extends User {
 
@@ -135,11 +136,15 @@ public class CompanyRepresentative extends User {
 					break;
 				case 5:
 					System.out.print("Enter new opening date (YYYY-MM-DD): ");
-					target.setOpeningDate(scanner.nextInt());
+					String dateStringOpen=scanner.nextLine();
+					LocalDate openingDate=LocalDate.parse(dateStringOpen);
+					target.setOpeningDate(openingDate);
 					break;
 				case 6:
 					System.out.print("Enter new closing date (YYYY-MM-DD): ");
-					target.setClosingDate(scanner.nextInt());
+					String dateStringClose=scanner.nextLine();
+					LocalDate closingDate=LocalDate.parse(dateStringClose);
+					target.setClosingDate(closingDate);
 					break;
 				case 7:
 					System.out.print("Enter number of slots (1-10): ");

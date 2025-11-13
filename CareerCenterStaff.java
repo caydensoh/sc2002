@@ -1,4 +1,4 @@
-public class CarrerCenterStaff extends User {
+public class CareerCenterStaff extends User {
 
 	private String staffDepartment;  //only attribute
 
@@ -8,7 +8,7 @@ public class CarrerCenterStaff extends User {
 	 * @param name from User class
 	 * @param staffDepartment from User class
 	 */
-	public CarrerCenterStaff(String userID, String name, String staffDepartment) {//constructor
+	public CareerCenterStaff(String userID, String name, String staffDepartment) {//constructor
 		// TODO - implement CarrerCenterStaff.CarrerCenterStaff
 		super(userID, name, "password");
 		this.staffDepartment = staffDepartment;
