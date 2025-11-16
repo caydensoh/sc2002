@@ -2,6 +2,7 @@ public class Application {
 	private String applicationID;
 	private Internship internship;
 	private String status; //Pending, Successful, Unsuccessful
+	private String withdrawalStatus; //Withdrawn, Active, Pending
 
 	public Application(Internship internship) {
 		// TODO - implement Application.Application
@@ -37,4 +38,14 @@ public class Application {
 	public void setStatus(String status) {
 		this.status = status;
 	}
+
+	public void setWithdrawalStatus(String status) {
+		this.withdrawalStatus = status;
+	}
+
+	public String getWithdrawalStatus() {
+		return this.withdrawalStatus;
+	}
+
+
 }

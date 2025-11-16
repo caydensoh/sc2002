@@ -77,12 +77,18 @@ public class CompanyRepresentative extends User {
 	 * Delete an internship by index
 	 * @param index
 	 */
-	public boolean deleteInternship(Integer index) {
-		if (index < 0 || index >= internships.size()) {
-            return false;
-        }
-        internships.remove(index.intValue());
-        return true;
+	public boolean deleteInternship(Internship internship) {
+		if (internship == null) {
+			System.out.println("Warning: Cannot delete a null internship.");
+			return false;
+		}
+		if (this.internships.contains(internship)) {
+			this.internships.remove(internship);
+			return true;
+		} else {
+			System.out.println("Warning: The specified internship is not associated with this company representative.");
+			return false;
+		}
 	}
 
 	public boolean getApproval() {
@@ -96,5 +102,37 @@ public class CompanyRepresentative extends User {
 	public void setApproval(boolean approval) {
 		this.approval = approval;
 	}
+
+/*Company Representatives
+• Company Representative list is empty at very beginning.
+• Company Representatives must register as a representative of a
+specific company, and they can only log in once approved by the Career
+Center Staff.
+• Able to create internship opportunities (up to 5) for their companies,
+which should include the following details:
+o Internship Title
+o Description
+o Internship Level (Basic, Intermediate, Advanced)
+o Preferred Majors (Assume 1 preferred major will do)
+Application opening date
+o Application closing date
+o Status (“Pending”, “Approved”, “Rejected”, “Filled”)
+o Company Name
+o Company Representatives in charge (automatically assigned)
+o Number of slots (max of 10)
+• Internship opportunities created must be approved by the career center
+staff
+o Once status is “Approved”, students may apply for them
+o If “Filled” or after the Closing Date, students will not be able to
+apply for them anymore
+o Able to view application details and student details for each of their
+internship opportunities
+• May Approve or Reject the internship application
+o Once approved, student application status becomes "Successful"
+o Student can then accept the placement confirmation
+o Internship opportunity status becomes "Filled" only when all
+available slots are confirmed by students
+• Able to toggle the visibility of the internship opportunity to “on” or “off”.
+This will be reflected in the internship list that will be visible to Students */
 
 }

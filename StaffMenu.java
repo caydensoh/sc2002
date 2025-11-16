@@ -13,6 +13,7 @@ public class StaffMenu extends Menu {
         System.out.println("2: View all internships");
         System.out.println("3: View all applications");
         System.out.println("4: Change my password");
+        System.out.println("5: Generate Internship Report");
         System.out.println("0: Logout");
         System.out.println("====================================================");
     }
@@ -36,6 +37,9 @@ public class StaffMenu extends Menu {
                 break;
             case "4":
                 UserApp.changeOwnPassword();
+                break;
+            case "5":
+                staff.generateInternshipReport();
                 break;
             case "0":
                 UserApp.logoutCurrentUser();

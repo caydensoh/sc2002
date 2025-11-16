@@ -131,7 +131,7 @@ public class Student extends User {
 
 		this.internship = null;
 
-		System.out.println("Your internship has been withdrawn.");
+		System.out.println("Your withdrawal request has been sent to the Career Center Staff");
 		return true;
 	}
 
