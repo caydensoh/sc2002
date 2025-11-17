@@ -85,4 +85,9 @@ public class StaffMenu extends Menu {
         }
         System.out.println();
     }
+
+    /*when applying for an internship, can add this also:
+    Application app = new Application(student, internship);
+        Menu.allApplications.add(app);
+     */
 }

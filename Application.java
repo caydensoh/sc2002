@@ -3,6 +3,7 @@ public class Application {
 	private Internship internship;
 	private String status; //Pending, Successful, Unsuccessful
 	private String withdrawalStatus; //Withdrawn, Active, Pending
+	private Student student;
 
 	public Application(Internship internship) {
 		// TODO - implement Application.Application
@@ -29,7 +30,14 @@ public class Application {
 	public String getStatus() {
 		return this.status;
 	}
+	
+	public void setStudent(Student student){
+		this.student = student;
+	}
 
+	public Student getStudent(){
+		return this.student;
+	}
 
 	/**
 	 * 

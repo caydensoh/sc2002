@@ -74,7 +74,7 @@ public class CompanyRepMenu extends Menu {
         System.out.print("Number of Slots (1-10): ");
         int slots = Integer.parseInt(scanner.nextLine().trim());
 
-        Internship intern = new Internship(null, title, description, level, major, openDate, closeDate,
+        Internship intern = new Internship(title, description, level, major, openDate, closeDate,
             compRep.getCompanyName(), compRep.getUserID(), slots);
         intern.setVisibility(true);
         Boolean added = compRep.addInternships(intern);
@@ -134,6 +134,7 @@ public class CompanyRepMenu extends Menu {
             System.out.println("7: Update Number of Slots (1-10)");
             System.out.println("8: Toggle Visibility");
             System.out.println("9: Delete Internship");
+            System.out.println("10: Review Internship Application");
             System.out.println("0: Save and Exit");
             System.out.print("Enter your choice: ");
 
@@ -216,6 +217,9 @@ public class CompanyRepMenu extends Menu {
                     } else {
                         System.out.println("Delete cancelled.\n");
                     }
+                }
+                case "10" -> {
+                    compRep.viewApplicationsForInternship(target);
                 }
                 case "0" -> {
                     editing = false;

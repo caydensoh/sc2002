@@ -64,7 +64,7 @@ public class CareerCenterStaff extends User {
 			switch (choice){
 				case 0:
 					intern.setStatus("Rejected");
-					rep.deleteInternship(intern);
+					rep.deleteInternship(intern); ////CHANGE PARAMETER TO INDEX
 					break;
 				case 1:
 					intern.setStatus("Approved");

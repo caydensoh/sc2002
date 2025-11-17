@@ -28,9 +28,9 @@ public class Internship {
 	 * @param slots
 	 * @param visibility
 	 */
-	public Internship(String internshipId, String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
+	public Internship(String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
 		// TODO - implement Internship.Internship
-		this.internshipID = internshipId == null? java.util.UUID.randomUUID().toString():internshipId;
+		this.internshipID = "INT-" + String.format("%03d", Menu.allInternships.size() + 1);  //MAKE SURE DOES NOT DUPLICATE
 		this.title=title;
 		this.description=description;
 		this.internshipLevel=internshipLevel;
@@ -183,4 +183,4 @@ public class Internship {
 	public void setVisibility(boolean visibility) {
 		this.visibility = visibility;
 	}
-}
+}// If “Filled” or after the Closing Date, students will not be able toapply for them anymore
