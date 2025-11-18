@@ -92,18 +92,23 @@ public class CareerCenterStaff extends User {
 		sc.close(); // optional: but be careful if other code uses System.in
 	}
 
-	public void approveWithdrawal(Application app) { //• Able to approve or reject student withdrawal requests (both before and after placement confirmation)
-		if ("Pending".equals(app.getWithdrawalStatus())){
-			app.setWithdrawalStatus("Withdrawn");
-		}else if ("Withdrawn".equals(app.getWithdrawalStatus())){
-			System.out.println("Application has already been withdrawn");
-		}else{
-			System.out.println("Application has not been requested to be withdrawn");
-		}
+	public void approveWithdrawal(Application app, boolean choice) { //• Able to approve or reject student withdrawal requests (both before and after placement confirmation)
 		
-	}
+	if ("Withdrawn".equals(app.getWithdrawalStatus())){
+			System.out.println("Application has already been withdrawn");
+		}else if("Active".equals(app.getWithdrawalStatus())){
+			System.out.println("Application has not been requested to be withdrawn");
+		}else if ("Pending".equals(app.getWithdrawalStatus())){
+			if (choice ==true){
+				
+				app.setWithdrawalStatus("Active");
+			}else{
+				app.setWithdrawalStatus("Withdrawn");
+			}
+		
+		}
 
-	
+	}
 
 	public void generateInternshipReport() { //Able to generate comprehensive reports regarding internshipopportunities created: o There should be filters to generate filter opportunities based on their Status, Preferred Majors, Internship Level, etc... 
 		Scanner scanner = Menu.scanner; // use shared scanner from Menu
