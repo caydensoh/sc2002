@@ -260,7 +260,8 @@ public class DataManager {
 				String status = parts[7].trim();
 				String company = parts[8].trim();
 				String compRepID = parts[9].trim();
-				int slots = Integer.parseInt(parts[10].trim());
+				//int slots = Integer.parseInt(parts[10].trim());
+				Integer slots = Integer.valueOf(parts[10].trim());
 				boolean visibility = Boolean.parseBoolean(parts[11].trim());
 
 				Internship intern = new Internship(internshipID, title, description, level, major, openDate, closeDate,

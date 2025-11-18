@@ -55,28 +55,41 @@ public class CareerCenterStaff extends User {
 	
 	}
 
-	public void approveInternship(Internship intern, CompanyRepresentative rep) { //Able to approve or reject internship opportunities submitted by Company Representatives
-		//o Once approved, internship opportunity status changes to "Approved" and becomes visible to eligible students
-		System.out.println("Would you like to approve or reject this Internship? (1 = Yes, 0 = No)");
-		Scanner sc = new Scanner(System.in);
-		int choice = sc.nextInt();
-		do{
-			switch (choice){
+	public void approveInternship(Internship intern, CompanyRepresentative rep, int index) {
+				Scanner sc = new Scanner(System.in);
+		int choice;
+
+		do {
+			System.out.println("Would you like to approve or reject this Internship? (1 = Approve, 0 = Reject)");
+
+			// Input validation to avoid crash on non-integer input
+			while (!sc.hasNextInt()) {
+				System.out.println("Invalid input. Please enter 1 or 0.");
+				sc.next(); // discard invalid token
+			}
+			choice = sc.nextInt();
+			sc.nextLine(); // consume newline
+
+			switch (choice) {
 				case 0:
 					intern.setStatus("Rejected");
-					rep.deleteInternship(intern); ////CHANGE PARAMETER TO INDEX
+					if (rep.deleteInternship(index)) {
+						System.out.println("Internship rejected and removed.");
+					} else {
+						System.out.println("Failed to remove internship (invalid index).");
+					}
 					break;
 				case 1:
 					intern.setStatus("Approved");
+					System.out.println("Internship approved.");
 					break;
 				default:
-					System.out.println("Please type a valid choice");
-					System.out.println("Would you like to approve or reject this Internship? (1 = Yes, 0 = No)");
-					choice = sc.nextInt();
-					break;
-
+					System.out.println("Please enter a valid choice (1 or 0).");
+					// Loop continues
 			}
-		}while (choice != 1 &&choice != 0);
+		} while (choice != 0 && choice != 1);
+
+		sc.close(); // optional: but be careful if other code uses System.in
 	}
 
 	public void approveWithdrawal(Application app) { //• Able to approve or reject student withdrawal requests (both before and after placement confirmation)

@@ -28,9 +28,9 @@ public class Internship {
 	 * @param slots
 	 * @param visibility
 	 */
-	public Internship(String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
+	public Internship(String internshipId, String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
 		// TODO - implement Internship.Internship
-		this.internshipID = "INT-" + String.format("%03d", Menu.allInternships.size() + 1);  //MAKE SURE DOES NOT DUPLICATE
+		this.internshipID = internshipId == null? java.util.UUID.randomUUID().toString():internshipId;
 		this.title=title;
 		this.description=description;
 		this.internshipLevel=internshipLevel;

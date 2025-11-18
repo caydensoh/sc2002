@@ -72,9 +72,23 @@ public class CompanyRepMenu extends Menu {
         System.out.print("Closing Date (YYYY-MM-DD): ");
         LocalDate closeDate = LocalDate.parse(scanner.nextLine().trim());
         System.out.print("Number of Slots (1-10): ");
-        int slots = Integer.parseInt(scanner.nextLine().trim());
+        Integer slots = null;
+        while (slots == null || slots < 1 || slots > 10) {
+            System.out.print("Number of Slots (1-10): ");
+            try {
+                slots = Integer.valueOf(scanner.nextLine().trim());
+                if (slots < 1 || slots > 10) {
+                    System.out.println("Slots must be between 1 and 10.");
+                    slots = null;
+                }
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
 
-        Internship intern = new Internship(title, description, level, major, openDate, closeDate,
+        String internshipId = "INT-" + String.format("%03d", allInternships.size() + 1);
+
+        Internship intern = new Internship(internshipId, title, description, level, major, openDate, closeDate,
             compRep.getCompanyName(), compRep.getUserID(), slots);
         intern.setVisibility(true);
         Boolean added = compRep.addInternships(intern);
