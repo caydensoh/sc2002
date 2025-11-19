@@ -29,7 +29,6 @@ public class Internship {
 	 * @param visibility
 	 */
 	public Internship(String internshipId, String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
-		// TODO - implement Internship.Internship
 		this.internshipID = internshipId == null? java.util.UUID.randomUUID().toString():internshipId;
 		this.title=title;
 		this.description=description;
@@ -183,4 +182,68 @@ public class Internship {
 	public void setVisibility(boolean visibility) {
 		this.visibility = visibility;
 	}
+
+	public boolean matchesFilter(FilterSetting filter) {
+        // Visible
+        if (this.visibility != filter.getVisibility()) {
+            return false;
+        }
+
+        // Avaliable
+        if (filter.getAvailable() != null && filter.getAvailable()) {
+            if (this.slots <= 0) {
+                return false;
+            }
+        }
+
+        // Match internship level(s) if filter specifies them
+        if (filter.getInternshipLevels() != null && !filter.getInternshipLevels().isEmpty()) {
+            boolean levelMatches = false;
+            for (String level : filter.getInternshipLevels()) {
+                if (this.internshipLevel.equalsIgnoreCase(level)) {
+                    levelMatches = true;
+                    break;
+                }
+            }
+            if (!levelMatches) {
+                return false;
+            }
+        }
+
+        // Match company name if filter specifies it
+        if (filter.getCompanyName() != null && !this.companyName.equalsIgnoreCase(filter.getCompanyName())) {
+            return false;
+        }
+
+        // Match title keywords if filter specifies them
+        if (filter.getTitleKeywords() != null && !this.title.toLowerCase().contains(filter.getTitleKeywords().toLowerCase())) {
+            return false;
+        }
+
+        // Match description keywords if filter specifies them
+        if (filter.getDescriptionKeywords() != null && !this.description.toLowerCase().contains(filter.getDescriptionKeywords().toLowerCase())) {
+            return false;
+        }
+
+        // Match status if filter specifies it
+        if (filter.getStatus() != null && !this.status.equals(filter.getStatus())) {
+            return false;
+        }
+
+        // Match preferred majors if filter specifies them
+        if (filter.getPreferredMajors() != null && !filter.getPreferredMajors().isEmpty()) {
+            String internMajor = this.preferredMajor;
+            boolean majorMatches = false;
+            for (String pMajor : filter.getPreferredMajors()) {
+                if (internMajor.equalsIgnoreCase(pMajor)) {
+                    majorMatches = true;
+                    break;
+                }
+            }
+            if (!majorMatches) {
+                return false;
+            }
+        }
+        return true;
+    }
 }// If “Filled” or after the Closing Date, students will not be able toapply for them anymore

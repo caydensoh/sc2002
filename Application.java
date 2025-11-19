@@ -1,22 +1,15 @@
 public class Application {
-	private String applicationID;
-	private Internship internship;
+	private final String applicationID;
+	private final Internship internship;
 	private String status; //Pending, Successful, Unsuccessful
 	private String withdrawalStatus; //Withdrawn, Active, Pending
 	private Student student;
 
-	public Application(Internship internship) {
-		// TODO - implement Application.Application
-		this.applicationID = java.util.UUID.randomUUID().toString();
-		this.internship = internship;
-		this.status = "Pending";
-	}
-
-	public Application(String applicationID, Internship internship) {
+	public Application(Internship internship, String applicationID, String status) {
 		// Constructor for loading from CSV with existing ID
-		this.applicationID = applicationID;
+		this.applicationID = applicationID == null? java.util.UUID.randomUUID().toString():applicationID;
 		this.internship = internship;
-		this.status = "Pending";
+		this.status = status == null? "Pending":status;
 	}
 
 	public String getApplicationID() {

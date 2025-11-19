@@ -1,4 +1,4 @@
-StaffID, Name, Department
-sng001, Dr. Sng Hui Lin, CCDS
-tan002, Mr. Tan Boon Kiat, CCDS
-lee003, Ms. Lee Mei Ling, CCDS 
+StaffID,Name,Department,Password
+sng001,Dr. Sng Hui Lin,CCDS,paste
+tan002,Mr. Tan Boon Kiat,CCDS,password
+lee003,Ms. Lee Mei Ling,CCDS,password

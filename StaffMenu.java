@@ -1,64 +1,53 @@
-import java.util.ArrayList;
-import java.util.List;
 
 public class StaffMenu extends Menu {
-    private CareerCenterStaff staff;
+    private final CareerCenterStaff staff;
+    private final InternshipRepo internships;
+    private final ApplicationRepo applications;
+    private final UserRepo users;
 
-    public StaffMenu(CareerCenterStaff s) {
-        this.staff = s;
-    }
-
-    public static void displayOptions(CareerCenterStaff s) {
-        System.out.println("\n========== Internship Management System (Staff) ==========");
-        System.out.println("Logged in as: " + s.getName() + " (" + s.getUserID() + ")");
-        System.out.println("1: View my profile");
-        System.out.println("2: View all internships");
-        System.out.println("3: View all applications");
-        System.out.println("4: Change my password");
-        System.out.println("5: Generate Internship Report");
-        System.out.println("6: Review Pending Company Reps");
-        System.out.println("7: Review Pending Internships");
-        System.out.println("8: Review Withdrawal Requests");
-        System.out.println("0: Logout");
-        System.out.println("====================================================");
-    }
-
-    public static void handleChoice(CareerCenterStaff s, String choice) {
-        StaffMenu menu = new StaffMenu(s);
-        menu.handleChoice(choice);
+    public StaffMenu(java.util.Scanner s, CareerCenterStaff st, InternshipRepo internshipRepo, ApplicationRepo applicationRepo, UserRepo users) {
+        super(s, st);
+        this.staff = st;
+        this.internships = internshipRepo;
+        this.applications = applicationRepo;
+        this.users = users;
     }
 
     @Override
-    public void handleChoice(String choice) {
+    public String displayGetChoices() {
+        System.out.println("\n========== Internship Management System (Staff) ==========");
+        System.out.println("Logged in as: " + staff.getName() + " (" + staff.getUserID() + ")");
+        System.out.println("1: View my profile");
+        System.out.println("2: Approve/Reject company representatives");
+        System.out.println("3: View all internships");
+        System.out.println("4: Approve/Reject internship opportunities");
+        System.out.println("5: Generate internship report");
+        System.out.println("6: View all applications");
+        System.out.println("7: Change my password");
+        System.out.println("0: Logout");
+        System.out.println("====================================================");
+        System.out.print("Enter your choice: ");
+        String input = scanner.nextLine().trim();
+        return input;
+    }
+
+    @Override
+    public void handleChoices(String choice) {
         switch (choice) {
-            case "1":
-                viewOwnProfile();
-                break;
-            case "2":
-                viewAllInternships();
-                break;
-            case "3":
-                viewAllApplications();
-                break;
-            case "4":
-                UserApp.changeOwnPassword();
-                break;
-            case "5":
-                staff.generateInternshipReport();
-                break;
-            case "6": reviewPendingCompanyReps(); break;      
-            case "7": reviewPendingInternships(); break;      
-            case "8": reviewWithdrawalRequests(); break;
-            case "0":
-                UserApp.logoutCurrentUser();
-                break;
-            default:
-                System.out.println("Invalid choice. Please try again.\n");
+            case "1" -> viewOwnProfile();
+            case "2" -> approveRejectCompanyReps();
+            case "3" -> viewAllInternships();
+            case "4" -> approveRejectInternships();
+            case "5" -> generateInternshipReport();
+            case "6" -> viewAllApplications();
+            case "7" -> changeOwnPassword();
+            case "0" -> logoutCurrentUser();
+            default -> System.out.println("Invalid choice. Please try again.\n");
         }
     }
 
     private void viewOwnProfile() {
-        displayUserHeader(staff);
+        displayUserHeader();
         System.out.println("Type: Career Center Staff");
         System.out.println("Department: " + staff.getStaffDepartment());
         System.out.println("================================\n");
@@ -66,13 +55,13 @@ public class StaffMenu extends Menu {
 
     private void viewAllInternships() {
         System.out.println("\n========== All Internships ==========");
-        if (allInternships.isEmpty()) {
+        if (internships.getAll().isEmpty()) {
             System.out.println("No internships available.\n");
             return;
         }
 
-        for (int i = 0; i < allInternships.size(); i++) {
-            Internship in = allInternships.get(i);
+        for (int i = 0; i < internships.getAll().size(); i++) {
+            Internship in = internships.getAll().get(i);
             System.out.println((i + 1) + ". " + in.getTitle() + " (" + in.getInternshipLevel() +
                 ") - " + in.getCompanyName() + " | Visibility: " + in.getVisibility());
         }
@@ -81,156 +70,205 @@ public class StaffMenu extends Menu {
 
     private void viewAllApplications() {
         System.out.println("\n========== All Applications ==========");
-        if (allApplications.isEmpty()) {
+
+        if (applications.getAll().isEmpty()) {
             System.out.println("No applications yet.\n");
             return;
         }
 
-        for (int i = 0; i < allApplications.size(); i++) {
-            Application app = allApplications.get(i);
-            System.out.println((i + 1) + ". " + app.getInternship().getTitle() +
-                " - Status: " + app.getStatus());
+        // List all applications with index, student, and internship basic info
+        for (int i = 0; i < applications.getAll().size(); i++) {
+            Application app = applications.getAll().get(i);
+            Student student = app.getStudent();
+            Internship internship = app.getInternship();
+
+            String studentInfo = student != null ? student.getName() + " (" + student.getUserID() + ")" : "Unknown Student";
+            String internshipInfo = internship != null ? internship.getTitle() : "Unknown Internship";
+
+            System.out.println((i + 1) + ". " + studentInfo + " -> " + internshipInfo);
         }
-        System.out.println();
+
+        while (true) {
+            System.out.print("\nEnter application number to view details (0 to return): ");
+            String input = scanner.nextLine().trim();
+
+            int choice;
+            try {
+                choice = Integer.parseInt(input);
+            } catch (NumberFormatException e) {
+                System.out.println("Invalid input. Please enter a number.");
+                continue;
+            }
+
+            if (choice == 0) {
+                break; // exit to previous menu
+            }
+
+            if (choice < 1 || choice > applications.getAll().size()) {
+                System.out.println("Number out of range. Try again.");
+                continue;
+            }
+
+            Application selected = applications.getAll().get(choice - 1);
+            Student student = selected.getStudent();
+            Internship internship = selected.getInternship();
+
+            System.out.println("\n========== Application Details ==========");
+            System.out.println("Application ID: " + selected.getApplicationID());
+            System.out.println("Student: " + (student != null ? student.getName() + " (" + student.getUserID() + ")" : "Unknown"));
+            System.out.println("Year / Major: " + (student != null ? student.getYearOfStudy() + " / " + student.getMajor() : "N/A"));
+            System.out.println("Internship: " + (internship != null ? internship.getTitle() : "Unknown"));
+            System.out.println("Application Status: " + selected.getStatus());
+            System.out.println("Withdrawal Status: " + (selected.getWithdrawalStatus() != null ? selected.getWithdrawalStatus() : "N/A"));
+            System.out.println("-------------------------------------------------");
+        }
     }
 
-    private void reviewPendingCompanyReps() {
-        List<CompanyRepresentative> pendingReps = new ArrayList<>();
-        for (User user : Menu.users) {
-            if (user instanceof CompanyRepresentative cr && !cr.getApproval()) {
-                pendingReps.add(cr);
+    private void approveRejectCompanyReps() {
+        System.out.println("\n========== Manage Company Representatives ==========");
+        UserRepo pendingReps = new UserRepo();
+        for (User u : users.getAll()) {
+            if (u instanceof CompanyRepresentative rep) {
+                if (!rep.getApproval()) {
+                    pendingReps.add(rep);
+                }
             }
         }
 
         if (pendingReps.isEmpty()) {
-            System.out.println("\nNo pending company representative registrations.\n");
+            System.out.println("No pending company representatives.\n");
             return;
         }
 
-        System.out.println("\n========== Pending Company Reps ==========");
         for (int i = 0; i < pendingReps.size(); i++) {
-            CompanyRepresentative rep = pendingReps.get(i);
-            System.out.println((i + 1) + ". " + rep.getName() + " (" + rep.getUserID() + ") - " + rep.getCompanyName());
+            CompanyRepresentative rep = (CompanyRepresentative) pendingReps.getAll().get(i);
+            System.out.println((i + 1) + ". " + rep.getName() + " (" + rep.getCompanyName() + ")");
         }
 
-        System.out.print("\nSelect a rep to review (0 to cancel): ");
+        System.out.print("\nSelect representative (0 to cancel): ");
         try {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < pendingReps.size()) {
-                staff.approveAccountCreation(pendingReps.get(idx));
-            } else if (idx != -1) {
-                System.out.println("Invalid selection.\n");
+                CompanyRepresentative selected = (CompanyRepresentative) pendingReps.getAll().get(idx);
+                System.out.println("\n1: Approve");
+                System.out.println("2: Reject");
+                System.out.print("Choose action: ");
+                String action = scanner.nextLine().trim();
+                if (action.equals("1")) {
+                    selected.setApproval(true);
+                    System.out.println("Representative approved!\n");
+                } else if (action.equals("2")) {
+                    users.remove(selected);
+                    System.out.println("Representative rejected and removed.\n");
+                }
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.\n");
         }
     }
 
-    private void reviewPendingInternships() {
-        List<Internship> pendingInternships = new ArrayList<>();
-        List<CompanyRepresentative> owners = new ArrayList<>();
-
-        // Find all pending internships and their owners
-        for (Internship intern : Menu.allInternships) {
-            if ("Pending".equals(intern.getStatus())) {
+    private void approveRejectInternships() {
+        System.out.println("\n========== Approve/Reject Internships ==========");
+        java.util.List<Internship> pendingInternships = new java.util.ArrayList<>();
+        for (Internship intern : internships.getAll()) {
+            if (intern.getStatus().equals("Pending")) {
                 pendingInternships.add(intern);
-                // Find owner
-                CompanyRepresentative owner = null;
-                for (User user : Menu.users) {
-                    if (user instanceof CompanyRepresentative cr &&
-                        cr.getUserID().equals(intern.getCompanyRepIC())) {
-                        owner = cr;
-                        break;
-                    }
-                }
-                owners.add(owner);
             }
         }
 
         if (pendingInternships.isEmpty()) {
-            System.out.println("\nNo pending internships.\n");
+            System.out.println("No pending internships.\n");
             return;
         }
 
-        System.out.println("\n========== Pending Internships ==========");
         for (int i = 0; i < pendingInternships.size(); i++) {
             Internship intern = pendingInternships.get(i);
-            System.out.println((i + 1) + ". " + intern.getTitle() + " at " + intern.getCompanyName());
+            System.out.println((i + 1) + ". " + intern.getTitle() + " (" + intern.getInternshipLevel() +
+                ") - " + intern.getCompanyName());
         }
 
-        System.out.print("\nSelect an internship to review (0 to cancel): ");
+        System.out.print("\nSelect internship (0 to cancel): ");
         try {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < pendingInternships.size()) {
-                Internship intern = pendingInternships.get(idx);
-                CompanyRepresentative owner = owners.get(idx);
-                if (owner != null) {
-                    // Find index in owner's list (needed for deletion on reject)
-                    int ownerIndex = owner.getInternships().indexOf(intern);
-                    staff.approveInternship(intern, owner, ownerIndex);
-                } else {
-                    System.out.println("Owner not found. Approving without deletion capability.");
-                    // Fallback: approve without delete
-                    System.out.print("Approve? (1=Yes, 0=No): ");
-                    int choice = Integer.parseInt(scanner.nextLine().trim());
-                    if (choice == 1) {
-                        intern.setStatus("Approved");
-                        System.out.println("Approved.");
-                    } else {
-                        intern.setStatus("Rejected");
-                        System.out.println("Rejected.");
-                    }
+                Internship selected = pendingInternships.get(idx);
+                System.out.println("\n1: Approve");
+                System.out.println("2: Reject");
+                System.out.print("Choose action: ");
+                String action = scanner.nextLine().trim();
+                if (action.equals("1")) {
+                    selected.setStatus("Approved");
+                    System.out.println("Internship approved!\n");
+                } else if (action.equals("2")) {
+                    selected.setStatus("Approved");
+                    System.out.println("Internship rejected.\n");
                 }
-            } else if (idx != -1) {
-                System.out.println("Invalid selection.\n");
             }
-        } catch (Exception e) {
-            System.out.println("Error processing selection: " + e.getMessage());
-        }
-    }
-
-
-    private void reviewWithdrawalRequests() {
-        List<Application> pendingWithdrawals = new ArrayList<>();
-        for (Application app : Menu.allApplications) {
-            if ("Pending".equals(app.getWithdrawalStatus())) {
-                pendingWithdrawals.add(app);
-            }
-        }
-
-        if (pendingWithdrawals.isEmpty()) {
-            System.out.println("\nNo pending withdrawal requests.\n");
-            return;
-        }
-
-        System.out.println("\n========== Pending Withdrawal Requests ==========");
-        for (int i = 0; i < pendingWithdrawals.size(); i++) {
-            Application app = pendingWithdrawals.get(i);
-            System.out.println((i + 1) + ". " + app.getStudent().getName() + 
-                " - " + app.getInternship().getTitle() + " (App ID: " + app.getApplicationID() + ")");
-        }
-
-        System.out.print("\nSelect a request to process (0 to cancel): ");
-        try {
-            int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
-            if (idx >= 0 && idx < pendingWithdrawals.size()) {
-                Application app = pendingWithdrawals.get(idx);
-                System.out.print("Approve withdrawal? (1 = Approve, 0 = Reject): ");
-                int choice = Integer.parseInt(scanner.nextLine().trim());
-                staff.approveWithdrawal(app, choice == 0); // Note: your method uses 'true' to keep active
-                // Clarify logic: if choice==1 (approve withdrawal), then set to Withdrawn
-                // But your current method: if(choice==true) -> set to Active (keep)
-                // So: approve withdrawal => choice = false
-            } else if (idx != -1) {
-                System.out.println("Invalid selection.\n");
-            }
-        } catch (Exception e) {
+        } catch (NumberFormatException e) {
             System.out.println("Invalid input.\n");
         }
     }
 
-    /*when applying for an internship, can add this also:
-    Application app = new Application(student, internship);
-        Menu.allApplications.add(app);
-     */
+    public void generateInternshipReport() { 
+        //Able to generate comprehensive reports regarding internshipopportunities created.
+        //There should be filters to generate filter opportunities based on their Status, Preferred Majors, Internship Level, etc... 
+		System.out.println("\n========== Generate Internship Report ==========");
+
+		// Get filter inputs
+		System.out.print("Enter Status filter (press Enter to skip): ");
+		String statusFilter = scanner.nextLine().trim();
+		if (statusFilter.isEmpty()) statusFilter = null;
+
+		System.out.print("Enter Preferred Major filter (press Enter to skip): ");
+		String majorFilter = scanner.nextLine().trim();
+		if (majorFilter.isEmpty()) majorFilter = null;
+
+		System.out.print("Enter Internship Level filter (press Enter to skip): ");
+		String levelFilter = scanner.nextLine().trim();
+		if (levelFilter.isEmpty()) levelFilter = null;
+
+		// Filter internships
+        InternshipRepo filtered = new InternshipRepo();
+		for (Internship intern : internships.getAll()) {
+			boolean match = true;
+
+			if (statusFilter != null && !intern.getStatus().equalsIgnoreCase(statusFilter)) {
+				match = false;
+			}
+			if (majorFilter != null && intern.getPreferredMajor() != null &&
+				!intern.getPreferredMajor().equalsIgnoreCase(majorFilter)) {
+				match = false;
+			}
+			if (levelFilter != null && intern.getInternshipLevel() != null &&
+				!intern.getInternshipLevel().equalsIgnoreCase(levelFilter)) {
+				match = false;
+			}
+
+			if (match) {
+				filtered.add(intern);
+			}
+		}
+
+		// display results
+		if (filtered.isEmpty()) {
+			System.out.println("\nNo internships match the selected filters.\n");
+		} else {
+			System.out.println("\n========== Filtered Internship Report ==========");
+			System.out.printf("%-15s %-25s %-15s %-20s %-10s %-10s%n",
+				"ID", "Title", "Level", "Major", "Status", "Slots");
+			System.out.println("------------------------------------------------------------------------------------------");
+			for (Internship intern : filtered.getAll()) {
+				System.out.printf("%-15s %-25s %-15s %-20s %-10s %-10d%n",
+					intern.getInternshipID().substring(0, Math.min(14, intern.getInternshipID().length())),
+					intern.getTitle().length() > 24 ? intern.getTitle().substring(0, 24) : intern.getTitle(),
+					intern.getInternshipLevel() == null ? "N/A" : intern.getInternshipLevel(),
+					intern.getPreferredMajor() == null ? "N/A" : intern.getPreferredMajor(),
+					intern.getStatus(),
+					intern.getSlots() == null ? 0 : intern.getSlots()
+				);
+			}
+			System.out.println("------------------------------------------------------------------------------------------");
+			System.out.println("Total matching internships: " + filtered.size() + "\n");
+		}
+	}
 }

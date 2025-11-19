@@ -1,15 +1,21 @@
 import java.util.*;
 
 public class StudentMenu extends Menu {
-    private Student student;
+    private final Student student;
+    private final InternshipRepo iRepo;
+    private final ApplicationRepo aRepo;
 
-    public StudentMenu(Student s) {
+    public StudentMenu(Scanner sc, Student s, InternshipRepo r, ApplicationRepo a) {
+        super(sc, s);
         this.student = s;
+        this.iRepo = r;
+        this.aRepo = a;
     }
 
-    public static void displayOptions(Student s) {
+    @Override
+    public String displayGetChoices() {
         System.out.println("\n========== Internship Management System (Student) ==========");
-        System.out.println("Logged in as: " + s.getName() + " (" + s.getUserID() + ")");
+        System.out.println("Logged in as: " + student.getName() + " (" + student.getUserID() + ")");
         System.out.println("1: View my profile");
         System.out.println("2: Browse internships");
         System.out.println("3: View my applications");
@@ -17,41 +23,26 @@ public class StudentMenu extends Menu {
         System.out.println("5: Manage filter settings");
         System.out.println("0: Logout");
         System.out.println("====================================================");
-    }
-
-    public static void handleChoice(Student s, String choice) {
-        StudentMenu menu = new StudentMenu(s);
-        menu.handleChoice(choice);
+        System.out.print("Enter your choice: ");
+        String input = scanner.nextLine().trim();
+	    return input;
     }
 
     @Override
-    public void handleChoice(String choice) {
+    public void handleChoices(String choice) {
         switch (choice) {
-            case "1":
-                viewOwnProfile();
-                break;
-            case "2":
-                browseInternships();
-                break;
-            case "3":
-                viewStudentApplications();
-                break;
-            case "4":
-                UserApp.changeOwnPassword();
-                break;
-            case "5":
-                manageFilterSettings();
-                break;
-            case "0":
-                UserApp.logoutCurrentUser();
-                break;
-            default:
-                System.out.println("Invalid choice. Please try again.\n");
+            case "1" -> viewOwnProfile();
+            case "2" -> browseInternships();
+            case "3" -> viewStudentApplications();
+            case "4" -> changeOwnPassword();
+            case "5" -> manageFilterSettings();
+            case "0" -> logoutCurrentUser();
+            default -> System.out.println(choice);//"Invalid choice. Please try again.\n");
         }
     }
 
     private void viewOwnProfile() {
-        displayUserHeader(student);
+        displayUserHeader();
         System.out.println("Type: Student");
         System.out.println("Year of Study: " + student.getYearOfStudy());
         System.out.println("Major: " + student.getMajor());
@@ -65,8 +56,8 @@ public class StudentMenu extends Menu {
         FilterSetting filter = student.getFilterSettings();
 
         List<Internship> filtered = new ArrayList<>();
-        for (Internship intern : allInternships) {
-            if (matchesFilter(intern, filter)) {
+        for (Internship intern : iRepo.getAll()) {
+            if (intern.matchesFilter(filter)) {
                 filtered.add(intern);
             }
         }
@@ -87,9 +78,9 @@ public class StudentMenu extends Menu {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < filtered.size()) {
                 Internship selected = filtered.get(idx);
-                Application app = new Application(selected);
+                Application app = new Application(selected, null, null);
                 student.addApplication(app);
-                allApplications.add(app);
+                aRepo.add(app);
                 System.out.println("Application submitted!\n");
             }
         } catch (NumberFormatException e) {

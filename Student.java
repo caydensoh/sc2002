@@ -5,7 +5,7 @@ public class Student extends User {
 
 	private Integer yearOfStudy;
 	private String major;
-	private List<Application> applicationsList;
+	private ApplicationRepo applicationsList;
 	private Application internship;
 
 	/**
@@ -19,7 +19,7 @@ public class Student extends User {
 		super(userID, name, password);
 		this.yearOfStudy = yearOfStudy;
 		this.major = major;
-		this.applicationsList = new ArrayList<>();
+		this.applicationsList = new ApplicationRepo();
 		this.internship = null;
 		if (filterSettings != null) {
 			this.setFilterSettings(filterSettings);
@@ -66,7 +66,7 @@ public class Student extends User {
 	}
 
 	public List<Application> getApplications() {
-		return this.applicationsList;
+		return this.applicationsList.getAll();
 	}
 
 	public boolean addApplication(Application application) {
@@ -91,7 +91,7 @@ public class Student extends User {
 		if (index < 0 || index >= this.applicationsList.size()) {
 			return false;
 		}
-		Application app = this.applicationsList.get(index);
+		Application app = this.applicationsList.getAll().get(index);
 		applicationsList.remove(app);
 		return true;
 	}
@@ -105,7 +105,7 @@ public class Student extends User {
 			return false;
 		}
 
-		Application selected = this.applicationsList.get(index);
+		Application selected = this.applicationsList.getAll().get(index);
 		if (!"Successful".equals(selected.getStatus())) {
 			System.out.println("Can only accept applications with 'Successful' status.");
 			return false;
@@ -115,7 +115,7 @@ public class Student extends User {
 		this.internship = selected;
 
 		// withdraw all others by creating a new list
-		List<Application> remaining = new ArrayList<>();
+		ApplicationRepo remaining = new ApplicationRepo();
 		remaining.add(selected);
 		this.applicationsList = remaining;
 

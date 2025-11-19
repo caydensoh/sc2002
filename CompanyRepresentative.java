@@ -1,5 +1,3 @@
-import java.time.LocalDate;
-import java.time.format.DateTimeParseException;
 import java.util.List;
 import java.util.Scanner;
 
@@ -8,7 +6,8 @@ public class CompanyRepresentative extends User {
 	final private String companyName;
 	private String department;
 	private String position;
-	private List<Internship> internships;
+	private InternshipRepo internships;
+	private ApplicationRepo applications;
 	private boolean approval; 
 
 	/**
@@ -24,7 +23,6 @@ public class CompanyRepresentative extends User {
 		this.companyName=companyName;
 		this.department=department;
 		this.position=position;
-		this.internships = new java.util.ArrayList<>();
 		this.approval = false;
 	}
 
@@ -202,83 +200,83 @@ public class CompanyRepresentative extends User {
 	}
 /*
 
-o Able to view application details and student details for each of their
-internship opportunities
-	• May Approve or Reject the internship application
-	o Once approved, student application status becomes "Successful"
-	o Student can then accept the placement confirmation
-	o Internship opportunity status becomes "Filled" only when all
-	available slots are confirmed by students*/
-	public void viewApplicationsForInternship(Internship intern) {
-		if (!this.internships.contains(intern)) {
-			System.out.println("You do not manage this internship.");
-			return;
-		}
+// o Able to view application details and student details for each of their
+// internship opportunities
+// 	• May Approve or Reject the internship application
+// 	o Once approved, student application status becomes "Successful"
+// 	o Student can then accept the placement confirmation
+// 	o Internship opportunity status becomes "Filled" only when all
+// 	available slots are confirmed by students*/
+// 	public void viewApplicationsForInternship(Internship intern) {
+// 		if (!this.internships.contains(intern)) {
+// 			System.out.println("You do not manage this internship.");
+// 			return;
+// 		}
 
-		System.out.println("\n=== Applications for: " + intern.getTitle() + " ===");
-		boolean found = false;
-		Scanner sc = Menu.scanner;
+// 		System.out.println("\n=== Applications for: " + intern.getTitle() + " ===");
+// 		boolean found = false;
+// 		Scanner sc = Menu.scanner;
 
-		for (Application app : Menu.allApplications) {
-			if (app.getInternship() == intern) {
-				System.out.println("Application ID: " + app.getApplicationID());
-				System.out.println("Student: " + app.getStudent().getName() + " (" + app.getStudent().getUserID() + ")");
-				System.out.println("Status: " + app.getStatus());
-				System.out.println("Withdrawal Status: " + app.getWithdrawalStatus());
-				System.out.println("----------------------------------------");
-				found = true;
+// 		for (Application app : Menu.allApplications) {
+// 			if (app.getInternship() == intern) {
+// 				System.out.println("Application ID: " + app.getApplicationID());
+// 				System.out.println("Student: " + app.getStudent().getName() + " (" + app.getStudent().getUserID() + ")");
+// 				System.out.println("Status: " + app.getStatus());
+// 				System.out.println("Withdrawal Status: " + app.getWithdrawalStatus());
+// 				System.out.println("----------------------------------------");
+// 				found = true;
 
-				// Only allow action if application is still pending
-				if ("Pending".equalsIgnoreCase(app.getStatus())) {
-					System.out.println("Would you like to approve or reject this application?");
-					System.out.println("1 = Approve");
-					System.out.println("0 = Reject");
-					System.out.println("-1 = Skip to next application");
+// 				// Only allow action if application is still pending
+// 				if ("Pending".equalsIgnoreCase(app.getStatus())) {
+// 					System.out.println("Would you like to approve or reject this application?");
+// 					System.out.println("1 = Approve");
+// 					System.out.println("0 = Reject");
+// 					System.out.println("-1 = Skip to next application");
 
-					int choice = -2;
-					while (choice != -1 && choice != 0 && choice != 1) {
-						try {
-							System.out.print("Enter your choice: ");
-							choice = Integer.parseInt(sc.nextLine().trim());
-							if (choice != -1 && choice != 0 && choice != 1) {
-								System.out.println("Invalid choice. Please enter 1, 0, or -1.");
-							}
-						} catch (NumberFormatException e) {
-							System.out.println("Please enter a valid number (1, 0, or -1).");
-						}
-					}
+// 					int choice = -2;
+// 					while (choice != -1 && choice != 0 && choice != 1) {
+// 						try {
+// 							System.out.print("Enter your choice: ");
+// 							choice = Integer.parseInt(sc.nextLine().trim());
+// 							if (choice != -1 && choice != 0 && choice != 1) {
+// 								System.out.println("Invalid choice. Please enter 1, 0, or -1.");
+// 							}
+// 						} catch (NumberFormatException e) {
+// 							System.out.println("Please enter a valid number (1, 0, or -1).");
+// 						}
+// 					}
 
-					if (choice == 1) {
-						// Approve application
-						app.setStatus("Successful");
-						System.out.println("Application approved for student: " + app.getStudent().getName());
+// 					if (choice == 1) {
+// 						// Approve application
+// 						app.setStatus("Successful");
+// 						System.out.println("Application approved for student: " + app.getStudent().getName());
 
-						// Check if internship is now filled
-						long successfulCount = 0;
-						for (Application a : Menu.allApplications) {
-							if (a.getInternship() == intern && "Successful".equals(a.getStatus())) {
-								successfulCount++;
-							}
-						}
-						if (successfulCount >= intern.getSlots()) {
-							intern.setStatus("Filled");
-							System.out.println(" Internship '" + intern.getTitle() + "' is now FILLED!");
-						}
-					} else if (choice == 0) {
-						// Reject application
-						app.setStatus("Unsuccessful");
-						System.out.println("Application rejected for student: " + app.getStudent().getName());
-					}
-					// If choice == -1, do nothing and continue
-				} 
-				System.out.println(); // blank line for readability
-			}
-		}
+// 						// Check if internship is now filled
+// 						long successfulCount = 0;
+// 						for (Application a : Menu.allApplications) {
+// 							if (a.getInternship() == intern && "Successful".equals(a.getStatus())) {
+// 								successfulCount++;
+// 							}
+// 						}
+// 						if (successfulCount >= intern.getSlots()) {
+// 							intern.setStatus("Filled");
+// 							System.out.println(" Internship '" + intern.getTitle() + "' is now FILLED!");
+// 						}
+// 					} else if (choice == 0) {
+// 						// Reject application
+// 						app.setStatus("Unsuccessful");
+// 						System.out.println("Application rejected for student: " + app.getStudent().getName());
+// 					}
+// 					// If choice == -1, do nothing and continue
+// 				} 
+// 				System.out.println(); // blank line for readability
+// 			}
+// 		}
 
-		if (!found) {
-			System.out.println("No applications found.");
-		}
-	}
+// 		if (!found) {
+// 			System.out.println("No applications found.");
+// 		}
+// 	}
 	
 
 }

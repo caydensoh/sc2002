@@ -1,7 +1,7 @@
 public abstract class User {
 
 	final private String userID;
-	private String name;
+	private final String name;
 	private String password;
 	private FilterSetting FilterSettings;
 

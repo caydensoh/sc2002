@@ -3,53 +3,49 @@ import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class CompanyRepMenu extends Menu {
-    private CompanyRepresentative compRep;
+    private final CompanyRepresentative compRep;
+    private final InternshipRepo internships = new InternshipRepo();
+    private ApplicationRepo applications = new ApplicationRepo();
+    private UserRepo users = new UserRepo();
 
-    public CompanyRepMenu(CompanyRepresentative cr) {
+    public CompanyRepMenu(java.util.Scanner s, CompanyRepresentative cr) {
+        super(s, cr);
         this.compRep = cr;
     }
 
-    public static void displayOptions(CompanyRepresentative cr) {
+    @Override
+    public String displayGetChoices() {
         System.out.println("\n========== Internship Management System (Company Rep) ==========");
-        System.out.println("Logged in as: " + cr.getName() + " (" + cr.getUserID() + ")");
+        System.out.println("Logged in as: " + compRep.getName() + " (" + compRep.getUserID() + ")");
         System.out.println("1: View my profile");
         System.out.println("2: Manage my internships");
         System.out.println("3: Create new internship");
-        System.out.println("4: Change my password");
+        System.out.println("4: Approve/reject internship applications");
+        System.out.println("5: Change my password");
         System.out.println("0: Logout");
         System.out.println("====================================================");
-    }
-
-    public static void handleChoice(CompanyRepresentative cr, String choice) {
-        CompanyRepMenu menu = new CompanyRepMenu(cr);
-        menu.handleChoice(choice);
+        System.out.print("Enter your choice: ");
+        String input = scanner.nextLine().trim();
+        return input;
     }
 
     @Override
-    public void handleChoice(String choice) {
+    public void handleChoices(String choice) {
         switch (choice) {
-            case "1":
-                viewOwnProfile();
-                break;
-            case "2":
-                manageCompanyInternships();
-                break;
-            case "3":
-                createNewInternship();
-                break;
-            case "4":
-                UserApp.changeOwnPassword();
-                break;
-            case "0":
-                UserApp.logoutCurrentUser();
-                break;
-            default:
-                System.out.println("Invalid choice. Please try again.\n");
+            case "1" -> viewOwnProfile();
+            case "2" -> manageCompanyInternships();
+            case "3" -> createNewInternship();
+            case "4" -> {
+                System.out.println("Approve/reject internship applications not available in this build.");
+            }
+            case "5" -> changeOwnPassword();
+            case "0" -> logoutCurrentUser();
+            default -> System.out.println("Invalid choice. Please try again.\n");
         }
     }
 
     private void viewOwnProfile() {
-        displayUserHeader(compRep);
+        displayUserHeader();
         System.out.println("Type: Company Representative");
         System.out.println("Company: " + compRep.getCompanyName());
         System.out.println("Department: " + compRep.getDepartment());
@@ -86,14 +82,14 @@ public class CompanyRepMenu extends Menu {
             }
         }
 
-        String internshipId = "INT-" + String.format("%03d", allInternships.size() + 1);
+        String internshipId = "INT-" + String.format("%03d", internships.size() + 1);
 
         Internship intern = new Internship(internshipId, title, description, level, major, openDate, closeDate,
             compRep.getCompanyName(), compRep.getUserID(), slots);
         intern.setVisibility(true);
         Boolean added = compRep.addInternships(intern);
         if (added) {
-            allInternships.add(intern);
+            internships.add(intern);
             System.out.println("Internship created successfully!\n");
         } else {
             System.out.println("Failed to create internship.\n");
@@ -233,7 +229,7 @@ public class CompanyRepMenu extends Menu {
                     }
                 }
                 case "10" -> {
-                    compRep.viewApplicationsForInternship(target);
+                    System.out.println("View applications not available in this build.");
                 }
                 case "0" -> {
                     editing = false;

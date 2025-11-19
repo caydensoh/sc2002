@@ -1,0 +1,38 @@
+import java.util.ArrayList;
+import java.util.List;
+public class InternshipRepo implements Repo<Internship> {
+    private final List<Internship> internships;
+    private int size;
+
+    public InternshipRepo() {
+        this.internships = new ArrayList<>();
+        this.size = 0;
+    }
+
+    @Override
+    public List<Internship> getAll() {
+        return this.internships;
+    }
+
+    @Override
+    public void add(Internship internship) {
+        this.internships.add(internship);
+        this.size++;
+    }
+
+    @Override
+    public void remove(Internship internship) {
+        this.internships.remove(internship);
+        this.size--;
+    }
+
+    @Override
+    public boolean isEmpty() {
+        return this.internships.isEmpty();
+    }
+
+    @Override
+    public int size() {
+        return this.size;
+    }
+}
