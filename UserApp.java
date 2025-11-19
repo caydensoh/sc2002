@@ -8,19 +8,20 @@ public class UserApp {
 	private static final Scanner scanner = new Scanner(System.in);
 	private static User activeUser = null;
 
+	private static final IDataManager dataManager = new DataManager();
 	public static void main(String[] args) {
 		// Initialize Menu base class with shared resources
 		Menu.initialize(scanner, users, allInternships, allApplications);
 
 		// Load all data on startup
-		DataManager.loadAllData(users, allInternships, allApplications);
+		dataManager.loadAllData(users, allInternships, allApplications);
 		loginScreen();
 		if (activeUser != null) {
 			mainMenuLoop();
 		}
 
 		// Save all data before exit
-		DataManager.saveAllData(users, allInternships, allApplications);
+		dataManager.saveAllData(users, allInternships, allApplications);
 		System.out.println("Exiting... All changes saved.");
 		scanner.close();
 	}
