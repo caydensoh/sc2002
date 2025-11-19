@@ -6,8 +6,10 @@ import java.util.*;
 /**
  * Handles all CSV file I/O operations for users, internships, and applications.
  */
-public class DataManager {
+public class DataManager implements IDataManager{
 	private static final String USERS_CSV_PATH = "test_cases/sample_student_list.csv";
+	private static final String COM_REP_CSV_PATH = "test_cases/company_representatives.csv";
+	private static final String CAR_CEN_STAFF_CSV_PATH = "test_cases/career_center_staff.csv"; 
 	private static final String INTERNSHIPS_CSV_PATH = "test_cases/internships.csv";
 	private static final String APPLICATIONS_CSV_PATH = "test_cases/applications.csv";
     private static final String FILTERS_CSV_PATH = "test_cases/filter_settings.csv";
@@ -15,7 +17,8 @@ public class DataManager {
 	/**
 	 * Load all data from CSV files
 	 */
-	public static void loadAllData(List<User> users, List<Internship> allInternships, List<Application> allApplications) {
+	@Override
+	public void loadAllData(List<User> users, List<Internship> allInternships, List<Application> allApplications) {
 		loadInternshipsFromCSV(allInternships);
 		loadApplicationsFromCSV(allApplications, allInternships);
 		loadUsersFromCSV(users, allApplications);
@@ -26,7 +29,8 @@ public class DataManager {
 	/**
 	 * Save all data to CSV files
 	 */
-	public static void saveAllData(List<User> users, List<Internship> allInternships, List<Application> allApplications) {
+	@Override
+	public void saveAllData(List<User> users, List<Internship> allInternships, List<Application> allApplications) {
 		saveUsersToCSV(users);
 		saveInternshipsToCSV(allInternships);
 		saveApplicationsToCSV(allApplications);
