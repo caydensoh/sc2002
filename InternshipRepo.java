@@ -35,4 +35,13 @@ public class InternshipRepo implements Repo<Internship> {
     public int size() {
         return this.size;
     }
+
+    public Internship find(String internshipID) {
+        for (Internship intern : this.internships) {
+            if (intern.getInternshipID().equals(internshipID)) {
+                return intern;
+            }
+        }
+        return null;
+    }
 }

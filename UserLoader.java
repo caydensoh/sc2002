@@ -81,6 +81,33 @@ public class UserLoader implements Loader {
             System.out.println("Note: Staff file not found or empty.");
         }
 
+        try {
+            List<String> repLines = Files.readAllLines(Paths.get(CsvPaths.COMPANY_REP));
+            if (!repLines.isEmpty()) {
+                for (int i = 1; i < repLines.size(); i++) {
+                    String line = repLines.get(i).trim();
+                    if (line.isEmpty()) continue;
+
+                    String[] parts = line.split(",");
+                    if (parts.length < 6) continue;
+
+                    String userID = parts[0].trim();
+                    String name = parts[1].trim();
+                    String password = parts.length > 2 && !parts[2].isEmpty() ? parts[2].trim() : "password";
+                    String companyName = parts[3].trim();
+                    String department = parts[4].trim();
+                    String position = parts[5].trim();
+                    boolean approval = parts.length > 6 && !parts[6].isEmpty() ? Boolean.parseBoolean(parts[6].trim()) : false;
+
+                    CompanyRepresentative rep = new CompanyRepresentative(userID, name, password, companyName, department, position);
+                    rep.setApproval(approval); // set approval separately since constructor defaults to false
+                    users.add(rep);
+                }
+            }
+        } catch (IOException e) {
+            System.out.println("Note: Company Representatives file not found or empty.");
+        }
+
     }
 
     @Override
@@ -131,6 +158,26 @@ public class UserLoader implements Loader {
             System.out.println("Staff saved.");
         } catch (IOException e) {
             System.out.println("Error writing staff CSV: " + e.getMessage());
+        }
+
+        try (FileWriter fw = new FileWriter(CsvPaths.COMPANY_REP)) {
+            fw.write("UserID,Name,Password,CompanyName,Department,Position,Approval\n");
+            for (User user : users.getAll()) {
+                if (user instanceof CompanyRepresentative rep) {
+                    String line = String.format("%s,%s,%s,%s,%s,%s,%s\n",
+                            rep.getUserID(),
+                            rep.getName(),
+                            rep.getPassword(),
+                            rep.getCompanyName(),
+                            rep.getDepartment(),
+                            rep.getPosition(),
+                            rep.getApproval());
+                    fw.write(line);
+                }
+            }
+            System.out.println("Company representatives saved.");
+        } catch (IOException e) {
+            System.out.println("Error writing company representatives CSV: " + e.getMessage());
         }
     }
 }

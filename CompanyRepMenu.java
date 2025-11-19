@@ -4,9 +4,9 @@ import java.util.*;
 
 public class CompanyRepMenu extends Menu {
     private final CompanyRepresentative compRep;
-    private final InternshipRepo internships = new InternshipRepo();
-    private ApplicationRepo applications = new ApplicationRepo();
-    private UserRepo users = new UserRepo();
+    private final InternshipRepo iRepo = new InternshipRepo();
+    private ApplicationRepo aRepo = new ApplicationRepo();
+    private UserRepo uRepo = new UserRepo();
 
     public CompanyRepMenu(java.util.Scanner s, CompanyRepresentative cr) {
         super(s, cr);
@@ -18,9 +18,9 @@ public class CompanyRepMenu extends Menu {
         System.out.println("\n========== Internship Management System (Company Rep) ==========");
         System.out.println("Logged in as: " + compRep.getName() + " (" + compRep.getUserID() + ")");
         System.out.println("1: View my profile");
-        System.out.println("2: Manage my internships");
+        System.out.println("2: Manage my iRepo");
         System.out.println("3: Create new internship");
-        System.out.println("4: Approve/reject internship applications");
+        System.out.println("4: Approve/reject internships");
         System.out.println("5: Change my password");
         System.out.println("0: Logout");
         System.out.println("====================================================");
@@ -36,7 +36,7 @@ public class CompanyRepMenu extends Menu {
             case "2" -> manageCompanyInternships();
             case "3" -> createNewInternship();
             case "4" -> {
-                System.out.println("Approve/reject internship applications not available in this build.");
+                System.out.println("Approve/rejecting internships not available in this build.");
             }
             case "5" -> changeOwnPassword();
             case "0" -> logoutCurrentUser();
@@ -82,14 +82,14 @@ public class CompanyRepMenu extends Menu {
             }
         }
 
-        String internshipId = "INT-" + String.format("%03d", internships.size() + 1);
+        String internshipId = "INT-" + String.format("%03d", iRepo.size() + 1);
 
         Internship intern = new Internship(internshipId, title, description, level, major, openDate, closeDate,
             compRep.getCompanyName(), compRep.getUserID(), slots);
         intern.setVisibility(true);
         Boolean added = compRep.addInternships(intern);
         if (added) {
-            internships.add(intern);
+            iRepo.add(intern);
             System.out.println("Internship created successfully!\n");
         } else {
             System.out.println("Failed to create internship.\n");
@@ -101,7 +101,7 @@ public class CompanyRepMenu extends Menu {
         List<Internship> interns = compRep.getInternships();
 
         if (interns == null || interns.isEmpty()) {
-            System.out.println("No internships yet.\n");
+            System.out.println("No iRepo yet.\n");
             return;
         }
 
@@ -229,7 +229,7 @@ public class CompanyRepMenu extends Menu {
                     }
                 }
                 case "10" -> {
-                    System.out.println("View applications not available in this build.");
+                    System.out.println("View aRepo not available in this build.");
                 }
                 case "0" -> {
                     editing = false;
@@ -239,4 +239,74 @@ public class CompanyRepMenu extends Menu {
             }
         }
     }
+    /*
+    public void viewApplicationsForInternship(Internship intern) {
+		if (this.internships.find(intern.getInternshipID()) != null) {
+			System.out.println("You do not manage this internship.");
+			return;
+		}
+
+		System.out.println("\n=== Applications for: " + intern.getTitle() + " ===");
+		boolean found = false;
+
+		for (Application app : Menu.allApplications) {
+			if (app.getInternship() == intern) {
+				System.out.println("Application ID: " + app.getApplicationID());
+				System.out.println("Student: " + app.getStudent().getName() + " (" + app.getStudent().getUserID() + ")");
+				System.out.println("Status: " + app.getStatus());
+				System.out.println("Withdrawal Status: " + app.getWithdrawalStatus());
+				System.out.println("----------------------------------------");
+				found = true;
+
+				// Only allow action if application is still pending
+				if ("Pending".equalsIgnoreCase(app.getStatus())) {
+					System.out.println("Would you like to approve or reject this application?");
+					System.out.println("1 = Approve");
+					System.out.println("0 = Reject");
+					System.out.println("-1 = Skip to next application");
+
+					int choice = -2;
+					while (choice != -1 && choice != 0 && choice != 1) {
+						try {
+							System.out.print("Enter your choice: ");
+							choice = Integer.parseInt(sc.nextLine().trim());
+							if (choice != -1 && choice != 0 && choice != 1) {
+								System.out.println("Invalid choice. Please enter 1, 0, or -1.");
+							}
+						} catch (NumberFormatException e) {
+							System.out.println("Please enter a valid number (1, 0, or -1).");
+						}
+					}
+
+					if (choice == 1) {
+						// Approve application
+						app.setStatus("Successful");
+						System.out.println("Application approved for student: " + app.getStudent().getName());
+
+						// Check if internship is now filled
+						long successfulCount = 0;
+						for (Application a : Menu.allApplications) {
+							if (a.getInternship() == intern && "Successful".equals(a.getStatus())) {
+								successfulCount++;
+							}
+						}
+						if (successfulCount >= intern.getSlots()) {
+							intern.setStatus("Filled");
+							System.out.println(" Internship '" + intern.getTitle() + "' is now FILLED!");
+						}
+					} else if (choice == 0) {
+						// Reject application
+						app.setStatus("Unsuccessful");
+						System.out.println("Application rejected for student: " + app.getStudent().getName());
+					}
+					// If choice == -1, do nothing and continue
+				} 
+				System.out.println(); // blank line for readability
+			}
+		}
+
+		if (!found) {
+			System.out.println("No applications found.");
+		}
+	}*/
 }
