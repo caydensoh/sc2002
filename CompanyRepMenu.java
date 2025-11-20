@@ -4,12 +4,12 @@ import java.util.*;
 
 public class CompanyRepMenu extends Menu {
     private final CompanyRepresentative compRep;
-    private final InternshipRepo iRepo = new InternshipRepo();
-    private ApplicationRepo aRepo = new ApplicationRepo();
-    private UserRepo uRepo = new UserRepo();
+    private final Scanner scanner;
+    
 
-    public CompanyRepMenu(java.util.Scanner s, CompanyRepresentative cr) {
+    public CompanyRepMenu(Scanner s, CompanyRepresentative cr) {
         super(s, cr);
+        this.scanner = s;
         this.compRep = cr;
     }
 
@@ -18,7 +18,7 @@ public class CompanyRepMenu extends Menu {
         System.out.println("\n========== Internship Management System (Company Rep) ==========");
         System.out.println("Logged in as: " + compRep.getName() + " (" + compRep.getUserID() + ")");
         System.out.println("1: View my profile");
-        System.out.println("2: Manage my iRepo");
+        System.out.println("2: Manage my Internships (iRepo)");
         System.out.println("3: Create new internship");
         System.out.println("4: Approve/reject internships");
         System.out.println("5: Change my password");
@@ -32,28 +32,26 @@ public class CompanyRepMenu extends Menu {
     @Override
     public void handleChoices(String choice) {
         switch (choice) {
-            case "1" -> viewOwnProfile();
-            case "2" -> manageCompanyInternships();
-            case "3" -> createNewInternship();
-            case "4" -> {
-                System.out.println("Approve/rejecting internships not available in this build.");
-            }
+            case "1" -> compRep.displayProfile();
+            case "2" -> manageInternships();
+            case "3" -> createInternship();
+            case "4" -> approveRejectApplications();
             case "5" -> changeOwnPassword();
             case "0" -> logoutCurrentUser();
-            default -> System.out.println("Invalid choice. Please try again.\n");
+            default -> System.out.println("Invalid choice.\n");
         }
     }
 
-    private void viewOwnProfile() {
+    /*private void viewOwnProfile() {
         displayUserHeader();
         System.out.println("Type: Company Representative");
         System.out.println("Company: " + compRep.getCompanyName());
         System.out.println("Department: " + compRep.getDepartment());
         System.out.println("Position: " + compRep.getPosition());
         System.out.println("================================\n");
-    }
+    }*/
 
-    private void createNewInternship() {
+    private void createInternship() {
         System.out.println("\n========== Create New Internship ==========");
         System.out.print("Title: ");
         String title = scanner.nextLine().trim();
@@ -82,163 +80,163 @@ public class CompanyRepMenu extends Menu {
             }
         }
 
-        String internshipId = "INT-" + String.format("%03d", iRepo.size() + 1);
+        String internshipId = "INT-" + String.format("%03d", compRep.getInternships().size() + 1);
 
         Internship intern = new Internship(internshipId, title, description, level, major, openDate, closeDate,
             compRep.getCompanyName(), compRep.getUserID(), slots);
         intern.setVisibility(true);
         Boolean added = compRep.addInternships(intern);
         if (added) {
-            iRepo.add(intern);
+            compRep.getInternships().add(intern);
             System.out.println("Internship created successfully!\n");
         } else {
             System.out.println("Failed to create internship.\n");
         }
     }
 
-    private void manageCompanyInternships() {
-        System.out.println("\n========== My Internships ==========");
-        List<Internship> interns = compRep.getInternships();
+    private LocalDate parseDate(String label) {
+        try {
+            return LocalDate.parse(scanner.nextLine().trim());
+        } catch (DateTimeParseException e) {
+            System.out.println("Invalid date format. Use YYYY-MM-DD.");
+            return null;
+        }
+    }
 
-        if (interns == null || interns.isEmpty()) {
-            System.out.println("No iRepo yet.\n");
+    private Integer readSlots() {
+        while (true) {
+            System.out.print("Number of Slots (1-10): ");
+            try {
+                int slots = Integer.parseInt(scanner.nextLine().trim());
+                if (slots >= 1 && slots <= 10) return slots;
+                System.out.println("Slots must be between 1 and 10.");
+            } catch (NumberFormatException e) {
+                System.out.println("Please enter a valid number.");
+            }
+        }
+    }
+
+    private void manageInternships() {
+        List<Internship> interns = compRep.getInternships();
+        if (interns.isEmpty()) {
+            System.out.println("\nNo internships yet.\n");
             return;
         }
 
+        System.out.println("\n========== My Internships ==========");
         for (int i = 0; i < interns.size(); i++) {
             System.out.println((i + 1) + ". " + interns.get(i).getTitle() +
                 " - Status: " + interns.get(i).getStatus());
         }
-        
+
         System.out.print("\nSelect internship to manage (0 to cancel): ");
         try {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < interns.size()) {
-                updateInternshipMenu(idx);
-            } else if (idx != -1) {
-                System.out.println("Invalid selection.\n");
+                updateInternshipMenu(interns.get(idx));
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.\n");
         }
     }
 
-    private void updateInternshipMenu(int index) {
-        Internship target = compRep.getInternships().get(index);
-        
-        // Only allow editing if status is "Pending" (before approval)
-        if (!target.getStatus().equals("Pending")) {
-            System.out.println("Cannot update internship after it has been approved/rejected/filled.\n");
+    private void updateInternshipMenu(Internship intern) {
+        if (!"Pending".equals(intern.getStatus())) {
+            System.out.println("Cannot update: status is '" + intern.getStatus() + "'.\n");
             return;
         }
 
-        boolean editing = true;
-        while (editing) {
+        while (true) {
             System.out.println("\n--- Update Internship Menu ---");
-            System.out.println("1: Update Title");
-            System.out.println("2: Update Description");
-            System.out.println("3: Update Level (Basic/Intermediate/Advanced)");
-            System.out.println("4: Update Preferred Major");
-            System.out.println("5: Update Opening Date (YYYY-MM-DD)");
-            System.out.println("6: Update Closing Date (YYYY-MM-DD)");
-            System.out.println("7: Update Number of Slots (1-10)");
-            System.out.println("8: Toggle Visibility");
-            System.out.println("9: Delete Internship");
-            System.out.println("10: Review Internship Application");
-            System.out.println("0: Save and Exit");
-            System.out.print("Enter your choice: ");
-
+            System.out.println("1: Title | 2: Description | 3: Level | 4: Major");
+            System.out.println("5: Open Date | 6: Close Date | 7: Slots | 8: Toggle Visibility");
+            System.out.println("9: Delete | 10: View Apps | 0: Save & Exit");
+            System.out.print("Choice: ");
             String choice = scanner.nextLine().trim();
+
             switch (choice) {
                 case "1" -> {
-                    System.out.print("Enter new title: ");
-                    target.setTitle(scanner.nextLine().trim());
-                    System.out.println("Title updated.\n");
+                    System.out.print("New title: ");
+                    intern.setTitle(scanner.nextLine().trim());
                 }
                 case "2" -> {
-                    System.out.print("Enter new description: ");
-                    target.setDescription(scanner.nextLine().trim());
-                    System.out.println("Description updated.\n");
+                    System.out.print("New description: ");
+                    intern.setDescription(scanner.nextLine().trim());
                 }
                 case "3" -> {
-                    System.out.print("Enter new level (Basic/Intermediate/Advanced): ");
+                    System.out.print("New level (Basic/Intermediate/Advanced): ");
                     String level = scanner.nextLine().trim();
-                    if (level.equals("Basic") || level.equals("Intermediate") || level.equals("Advanced")) {
-                        target.setInternshipLevel(level);
-                        System.out.println("Level updated.\n");
+                    if (List.of("Basic", "Intermediate", "Advanced").contains(level)) {
+                        intern.setInternshipLevel(level);
                     } else {
-                        System.out.println("Invalid level. No change made.\n");
+                        System.out.println("Invalid level.");
                     }
                 }
                 case "4" -> {
-                    System.out.print("Enter new preferred major: ");
-                    target.setPreferredMajor(scanner.nextLine().trim());
-                    System.out.println("Preferred major updated.\n");
+                    System.out.print("New major: ");
+                    intern.setPreferredMajor(scanner.nextLine().trim());
                 }
                 case "5" -> {
-                    System.out.print("Enter new opening date (YYYY-MM-DD): ");
-                    String openingInput = scanner.nextLine().trim();
-                    try {
-                        LocalDate openingDate = LocalDate.parse(openingInput);
-                        target.setOpeningDate(openingDate);
-                        System.out.println("Opening date updated.\n");
-                    } catch (DateTimeParseException e) {
-                        System.out.println("Invalid date format. Please use YYYY-MM-DD. No change made.\n");
-                    }
+                    System.out.print("New opening date (YYYY-MM-DD): ");
+                    LocalDate d = parseDate("Opening");
+                    if (d != null) intern.setOpeningDate(d);
                 }
                 case "6" -> {
-                    System.out.print("Enter new closing date (YYYY-MM-DD): ");
-                    String closingInput = scanner.nextLine().trim();
-                    try {
-                        LocalDate closingDate = LocalDate.parse(closingInput);
-                        target.setClosingDate(closingDate);
-                        System.out.println("Closing date updated.\n");
-                    } catch (DateTimeParseException e) {
-                        System.out.println("Invalid date format. Please use YYYY-MM-DD. No change made.\n");
-                    }
+                    System.out.print("New closing date (YYYY-MM-DD): ");
+                    LocalDate d = parseDate("Closing");
+                    if (d != null) intern.setClosingDate(d);
                 }
                 case "7" -> {
-                    System.out.print("Enter number of slots (1-10): ");
-                    String slotsInput = scanner.nextLine().trim();
-                    try {
-                        int slots = Integer.parseInt(slotsInput);
-                        if (slots >= 1 && slots <= 10) {
-                            target.setSlots(slots);
-                            System.out.println("Slots updated.\n");
-                        } else {
-                            System.out.println("Invalid number of slots. Must be between 1 and 10.\n");
-                        }
-                    } catch (NumberFormatException e) {
-                        System.out.println("Invalid number entered. No change made.\n");
-                    }
+                    Integer slots = readSlots();
+                    if (slots != null) intern.setSlots(slots);
                 }
                 case "8" -> {
-                    target.setVisibility(!target.getVisibility());
-                    System.out.println("Visibility toggled to " + (target.getVisibility() ? "ON" : "OFF") + "\n");
+                    intern.setVisibility(!intern.getVisibility());
+                    System.out.println("Visibility: " + (intern.getVisibility() ? "ON" : "OFF"));
                 }
                 case "9" -> {
-                    System.out.print("Are you sure you want to delete this internship? (yes/no): ");
-                    if (scanner.nextLine().trim().equalsIgnoreCase("yes")) {
-                        Boolean deleted = compRep.deleteInternship(index);
-                        if (deleted) {
-                            System.out.println("Internship deleted successfully.\n");
-                            editing = false;
+                    System.out.print("Delete? (yes/no): ");
+                    if ("yes".equalsIgnoreCase(scanner.nextLine().trim())) {
+                        // Find index and delete
+                        List<Internship> all = compRep.getInternships();
+                        int idx = all.indexOf(intern);
+                        if (idx >= 0) {
+                            compRep.deleteInternship(idx);
+                            return;
                         }
-                    } else {
-                        System.out.println("Delete cancelled.\n");
                     }
                 }
-                case "10" -> {
-                    System.out.println("View aRepo not available in this build.");
-                }
+                case "10" -> compRep.viewAndProcessApplicationsForInternship(intern, scanner);
                 case "0" -> {
-                    editing = false;
                     System.out.println("Updates saved.\n");
+                    return;
                 }
-                default -> System.out.println("Invalid choice. Try again.\n");
+                default -> System.out.println("Invalid choice.");
             }
         }
     }
+
+    private void approveRejectApplications() {
+        List<Internship> approvedInterns = compRep.getApprovedInternships();
+        if (approvedInterns.isEmpty()) {
+            System.out.println("No approved internships with applications.");
+            return;
+        }
+
+        for (int i = 0; i < approvedInterns.size(); i++) {
+            System.out.println((i + 1) + ". " + approvedInterns.get(i).getTitle());
+        }
+        System.out.print("Select internship (0 to cancel): ");
+        try {
+            int choice = Integer.parseInt(scanner.nextLine().trim());
+            if (choice >= 1 && choice <= approvedInterns.size()) {
+                compRep.viewAndProcessApplicationsForInternship(approvedInterns.get(choice - 1), scanner);
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.");
+        }
+    }
+    
     /*
     public void viewApplicationsForInternship(Internship intern) {
 		if (this.internships.find(intern.getInternshipID()) != null) {

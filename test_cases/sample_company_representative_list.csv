@@ -1,4 +1,4 @@
 UserID,Name,Password,CompanyName,Department,Position,Approval
 rep001,John Tan,password123,TechCorp,Sales,Manager,false
-rep002,Alice Lim,password456,DataSolutions,Marketing,Analyst,true
+rep002,Alice Lim,password,DataSolutions,Marketing,Analyst,true
 rep003,Bob Lee,InnovateX,Engineering,Engineer,false,true
