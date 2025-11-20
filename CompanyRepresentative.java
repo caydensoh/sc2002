@@ -152,11 +152,11 @@ public class CompanyRepresentative extends User {
 					String action = scanner.nextLine().trim().toLowerCase();
 					if ("a".equals(action)) {
 						app.setStatus("Successful");
-						System.out.println("✅ Application approved.");
+						System.out.println("Application approved.");
 						checkIfInternshipFilled(intern);
 					} else if ("r".equals(action)) {
 						app.setStatus("Unsuccessful");
-						System.out.println("❌ Application rejected.");
+						System.out.println("Application rejected.");
 					}
 				}
 			}
@@ -176,7 +176,7 @@ public class CompanyRepresentative extends User {
 		}
 		if (successfulCount >= intern.getSlots()) {
 			intern.setStatus("Filled");
-			System.out.println("🎉 Internship '" + intern.getTitle() + "' is now FILLED!");
+			System.out.println("Internship '" + intern.getTitle() + "' is now filled!");
 		}
 	}
 
