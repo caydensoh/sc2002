@@ -5,10 +5,12 @@ import java.util.*;
 public class UserLoader implements Loader {
     private final UserRepo users;
     private final ApplicationRepo applications;
+    private final InternshipRepo internships;
 
-    public UserLoader(UserRepo users, ApplicationRepo applications) {
+    public UserLoader(UserRepo users, ApplicationRepo applications, InternshipRepo internships) {
         this.users = users;
         this.applications = applications;
+        this.internships = internships;
     }
 
     @Override
@@ -93,15 +95,24 @@ public class UserLoader implements Loader {
 
                     String userID = parts[0].trim();
                     String name = parts[1].trim();
-                    String password = parts.length > 2 && !parts[2].isEmpty() ? parts[2].trim() : "password";
+                    String password = !parts[2].isEmpty() ? parts[2].trim() : "password";
                     String companyName = parts[3].trim();
                     String department = parts[4].trim();
                     String position = parts[5].trim();
-                    boolean approval = parts.length > 6 && !parts[6].isEmpty() ? Boolean.parseBoolean(parts[6].trim()) : false;
+                    boolean approval = !parts[6].isEmpty() ? Boolean.parseBoolean(parts[6].trim()) : false;
 
                     CompanyRepresentative rep = new CompanyRepresentative(userID, name, password, companyName, department, position);
                     rep.setApproval(approval); // set approval separately since constructor defaults to false
                     users.add(rep);
+
+                    // attach any internships that belong to this rep into their local repo
+                    if (internships != null) {
+                        for (Internship intern : internships.getAll()) {
+                            if (intern.getCompanyRepIC() != null && intern.getCompanyRepIC().equals(userID)) {
+                                rep.getInternships().add(intern);
+                            }
+                        }
+                    }
                 }
             }
         } catch (IOException e) {
@@ -117,7 +128,7 @@ public class UserLoader implements Loader {
             for (User user : users.getAll()) {
                 if (user instanceof Student s) {
                     StringBuilder appIDsBuilder = new StringBuilder();
-                    List<Application> apps = s.getApplications();
+                    ApplicationRepo apps = s.getApplications();
                     if (apps != null && !apps.isEmpty()) {
                         for (int i = 0; i < apps.size(); i++) {
                             appIDsBuilder.append(apps.get(i).getApplicationID());

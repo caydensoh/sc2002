@@ -1,6 +1,9 @@
 import java.util.List;
 
 public abstract interface Repo<T> {
+
+    T get(int index);
+
     List<T> getAll();
 
     void add(T item);

@@ -4,52 +4,51 @@ import java.util.*;
 
 public class CompanyRepMenu extends Menu {
     private final CompanyRepresentative compRep;
-    private final Scanner scanner;
-    
+    private final InternshipRepo iRepo;
+    private final ApplicationRepo aRepo;
+    private final UserRepo userRepo;
 
-    public CompanyRepMenu(Scanner s, CompanyRepresentative cr) {
+    public CompanyRepMenu(Scanner s, CompanyRepresentative cr, InternshipRepo iRepo, ApplicationRepo aRepo, UserRepo userRepo) {
         super(s, cr);
-        this.scanner = s;
         this.compRep = cr;
+        this.iRepo = iRepo;
+        this.aRepo = aRepo;
+        this.userRepo = userRepo;
+        optionMap.put("3", this::manageInternships);
+        optionLabels.put("3", "Manage internships");
+        optionMap.put("4", this::createInternship);
+        optionLabels.put("4", "Create internship");
+        optionMap.put("5", this::approveRejectApplications);
+        optionLabels.put("5", "Approve/Reject applications");
+        optionMap.put("6", this::changeOwnPassword);
+        optionLabels.put("6", "Change password");
     }
 
     @Override
-    public String displayGetChoices() {
-        System.out.println("\n========== Internship Management System (Company Rep) ==========");
-        System.out.println("Logged in as: " + compRep.getName() + " (" + compRep.getUserID() + ")");
-        System.out.println("1: View my profile");
-        System.out.println("2: Manage my Internships (iRepo)");
-        System.out.println("3: Create new internship");
-        System.out.println("4: Approve/reject internships");
-        System.out.println("5: Change my password");
-        System.out.println("0: Logout");
-        System.out.println("====================================================");
-        System.out.print("Enter your choice: ");
-        String input = scanner.nextLine().trim();
-        return input;
-    }
-
-    @Override
-    public void handleChoices(String choice) {
-        switch (choice) {
-            case "1" -> compRep.displayProfile();
-            case "2" -> manageInternships();
-            case "3" -> createInternship();
-            case "4" -> approveRejectApplications();
-            case "5" -> changeOwnPassword();
-            case "0" -> logoutCurrentUser();
-            default -> System.out.println("Invalid choice.\n");
+    protected void browseInternships() {
+        System.out.println("\n========== Browse Internships ==========");
+        InternshipRepo interns = compRep.getInternships();
+        if (interns.isEmpty()) {
+            System.out.println("No internships available.\n");
+            return;
         }
+        for (int i = 0; i < interns.size(); i++) {
+            Internship in = interns.get(i);
+            System.out.println((i + 1) + ". " + in.getTitle() + " (" + in.getInternshipLevel() +
+                ") - " + in.getCompanyName() + " | Slots: " + in.getSlots());
+        }
+        System.out.println();
     }
 
-    /*private void viewOwnProfile() {
+    @Override
+    protected void viewOwnProfile() {
         displayUserHeader();
         System.out.println("Type: Company Representative");
         System.out.println("Company: " + compRep.getCompanyName());
         System.out.println("Department: " + compRep.getDepartment());
         System.out.println("Position: " + compRep.getPosition());
         System.out.println("================================\n");
-    }*/
+    }
 
     private void createInternship() {
         System.out.println("\n========== Create New Internship ==========");
@@ -87,16 +86,17 @@ public class CompanyRepMenu extends Menu {
         intern.setVisibility(true);
         Boolean added = compRep.addInternships(intern);
         if (added) {
-            compRep.getInternships().add(intern);
+            // keep central internship repo in sync
+            if (iRepo != null) iRepo.add(intern);
             System.out.println("Internship created successfully!\n");
         } else {
             System.out.println("Failed to create internship.\n");
         }
     }
 
-    private LocalDate parseDate(String label) {
+    private LocalDate parseDate(String date) {
         try {
-            return LocalDate.parse(scanner.nextLine().trim());
+            return LocalDate.parse(date);
         } catch (DateTimeParseException e) {
             System.out.println("Invalid date format. Use YYYY-MM-DD.");
             return null;
@@ -117,7 +117,7 @@ public class CompanyRepMenu extends Menu {
     }
 
     private void manageInternships() {
-        List<Internship> interns = compRep.getInternships();
+        InternshipRepo interns = compRep.getInternships();
         if (interns.isEmpty()) {
             System.out.println("\nNo internships yet.\n");
             return;
@@ -178,12 +178,12 @@ public class CompanyRepMenu extends Menu {
                 }
                 case "5" -> {
                     System.out.print("New opening date (YYYY-MM-DD): ");
-                    LocalDate d = parseDate("Opening");
+                    LocalDate d = parseDate(scanner.nextLine().trim());
                     if (d != null) intern.setOpeningDate(d);
                 }
                 case "6" -> {
                     System.out.print("New closing date (YYYY-MM-DD): ");
-                    LocalDate d = parseDate("Closing");
+                    LocalDate d = parseDate(scanner.nextLine().trim());
                     if (d != null) intern.setClosingDate(d);
                 }
                 case "7" -> {
@@ -197,16 +197,11 @@ public class CompanyRepMenu extends Menu {
                 case "9" -> {
                     System.out.print("Delete? (yes/no): ");
                     if ("yes".equalsIgnoreCase(scanner.nextLine().trim())) {
-                        // Find index and delete
-                        List<Internship> all = compRep.getInternships();
-                        int idx = all.indexOf(intern);
-                        if (idx >= 0) {
-                            compRep.deleteInternship(idx);
-                            return;
-                        }
+                        compRep.getInternships().remove(intern);
+                        if (iRepo != null) iRepo.remove(intern);
                     }
                 }
-                case "10" -> compRep.viewAndProcessApplicationsForInternship(intern, scanner);
+                case "10" -> processApplicationsForInternship(intern);
                 case "0" -> {
                     System.out.println("Updates saved.\n");
                     return;
@@ -217,7 +212,7 @@ public class CompanyRepMenu extends Menu {
     }
 
     private void approveRejectApplications() {
-        List<Internship> approvedInterns = compRep.getApprovedInternships();
+        InternshipRepo approvedInterns = compRep.getApprovedInternships();
         if (approvedInterns.isEmpty()) {
             System.out.println("No approved internships with applications.");
             return;
@@ -230,13 +225,84 @@ public class CompanyRepMenu extends Menu {
         try {
             int choice = Integer.parseInt(scanner.nextLine().trim());
             if (choice >= 1 && choice <= approvedInterns.size()) {
-                compRep.viewAndProcessApplicationsForInternship(approvedInterns.get(choice - 1), scanner);
+                processApplicationsForInternship(approvedInterns.get(choice - 1));
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.");
         }
     }
     
+    
+    private void processApplicationsForInternship(Internship intern) {
+        ApplicationRepo appRepoLocal = this.aRepo != null ? this.aRepo : compRep.getAppRepo();
+        // userRepo is available via constructor or compRep, not used directly here
+        if (appRepoLocal == null) {
+            System.out.println("No application repository available.");
+            return;
+        }
+
+        System.out.println("\n=== Applications for: " + intern.getTitle() + " ===");
+        boolean found = false;
+
+        for (Application app : appRepoLocal.getAll()) {
+            if (intern.getInternshipID().equals(app.getInternship().getInternshipID())) {
+                Student student = null;
+                if (userRepo != null && app.getStudent() != null) {
+                    student = (Student) userRepo.find(app.getStudent().getUserID());
+                }
+                if (student == null) {
+                    try { student = app.getStudent(); } catch (Exception e) { /* ignore */ }
+                }
+
+                System.out.println("Application ID: " + app.getApplicationID());
+                System.out.println("Student: " + (student != null ? student.getName() + " (" + student.getUserID() + ")" : "Unknown"));
+                System.out.println("Status: " + app.getStatus());
+                System.out.println("Withdrawal: " + app.getWithdrawalStatus());
+                System.out.println("----------------------------------------");
+                found = true;
+
+                if ("Pending".equalsIgnoreCase(app.getStatus())) {
+                    System.out.print("Approve (A), Reject (R), or Skip (S)? ");
+                    String action = scanner.nextLine().trim().toLowerCase();
+                    if ("a".equals(action)) {
+                        app.setStatus("Successful");
+                        System.out.println("Application approved.");
+
+                        // decrement slots and update status if needed
+                        if (intern.getSlots() != null) {
+                            intern.setSlots(intern.getSlots() - 1);
+                            if (intern.getSlots() <= 0) {
+                                intern.setStatus("Filled");
+                                System.out.println("Internship '" + intern.getTitle() + "' is now filled!");
+
+                                // mark other pending applications for this internship as unsuccessful
+                                for (Application other : appRepoLocal.getAll()) {
+                                    if (other != app && intern.getInternshipID().equals(other.getInternship().getInternshipID())
+                                            && "Pending".equalsIgnoreCase(other.getStatus())) {
+                                        other.setStatus("Unsuccessful");
+                                    }
+                                }
+                            } else {
+                                // not yet filled, still may be more accepts later
+                                compRep.checkIfInternshipFilled(intern); // keep helper up-to-date
+                            }
+                        } else {
+                            // if slots not set, still call helper to keep behavior consistent
+                            compRep.checkIfInternshipFilled(intern);
+                        }
+                    } else if ("r".equals(action)) {
+                        app.setStatus("Unsuccessful");
+                        System.out.println("Application rejected.");
+                    }
+                }
+            }
+        }
+
+        if (!found) {
+            System.out.println("No applications found.");
+        }
+    }
+
     /*
     public void viewApplicationsForInternship(Internship intern) {
 		if (this.internships.find(intern.getInternshipID()) != null) {

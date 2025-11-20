@@ -1,5 +1,5 @@
 StudentID,Name,Major,Year,Email,Password,ApplicationIDs,AcceptedInternshipID
-S001,Alice Johnson,Computer Science,2,,pache,924176d6-86d4-446e-951c-e3c8be377f86,
+S001,Alice Johnson,Computer Science,2,,pache,924176d6-86d4-446e-951c-e3c8be377f86,924176d6-86d4-446e-951c-e3c8be377f86
 S002,Bob Smith,Software Engineering,3,,welcome2025,,
 S003,Carol White,Information Technology,1,,student001,,
 S004,David Lee,Computer Science,4,,dev2024,,

@@ -10,6 +10,11 @@ public class InternshipRepo implements Repo<Internship> {
     }
 
     @Override
+    public Internship get(int index) {
+        return this.internships.get(index);
+    }
+
+    @Override
     public List<Internship> getAll() {
         return this.internships;
     }

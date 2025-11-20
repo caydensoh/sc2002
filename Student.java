@@ -5,7 +5,7 @@ public class Student extends User {
 
 	private Integer yearOfStudy;
 	private String major;
-	private ApplicationRepo applicationsList;
+	private final ApplicationRepo applicationsList;
 	private Application internship;
 
 	/**
@@ -36,7 +36,7 @@ public class Student extends User {
 				allowedLevels.add("Intermediate");
 				allowedLevels.add("Advanced");
 			}
-			FilterSetting fs = new FilterSetting(null, null, allowedLevels, majors, null, null, true, true);
+			FilterSetting fs = new FilterSetting(null, null, allowedLevels, majors, null, null, true, true, false);
 			this.setFilterSettings(fs);
 		}
 	}
@@ -65,19 +65,28 @@ public class Student extends User {
 		this.major = major;
 	}
 
-	public List<Application> getApplications() {
-		return this.applicationsList.getAll();
+	public ApplicationRepo getApplications() {
+		return this.applicationsList;
 	}
 
 	public boolean addApplication(Application application) {
 		// Check max applications limit
-		if (this.applicationsList.size() >= 3) {
-			System.out.println("You have reached the maximum of 3 applications. Please remove an application to apply for more.");
-			return false;
+		int activeCount = 0;
+		for (Application app : this.applicationsList.getAll()) {
+			String ws = app.getWithdrawalStatus();
+			if (ws == null || !ws.equalsIgnoreCase("Withdrawn")) {
+				activeCount++;
+			}
+		}
+		if (activeCount >= 3) {
+			throw new IllegalStateException("Cannot apply to more than 3 internships.");
 		}
 		if (this.yearOfStudy <= 2 && !"Basic".equals(application.getInternship().getInternshipLevel())) {
-			System.out.println("Not eligible for this internship level. Level is too high for Year 1 and 2 students.");
-			return false;
+			throw new IllegalArgumentException("Students in year 2 or below can only apply to Basic level internships.");
+		}
+		// ensure bidirectional link
+		if (application.getStudent() == null) {
+			application.setStudent(this);
 		}
 		this.applicationsList.add(application);
 		return true;
@@ -93,45 +102,6 @@ public class Student extends User {
 		}
 		Application app = this.applicationsList.getAll().get(index);
 		applicationsList.remove(app);
-		return true;
-	}
-
-	/**
-	 * 
-	 * @param index
-	 */
-	public boolean acceptInternship(Integer index) {
-		if (index < 0 || index >= this.applicationsList.size()) {
-			return false;
-		}
-
-		Application selected = this.applicationsList.getAll().get(index);
-		if (!"Successful".equals(selected.getStatus())) {
-			System.out.println("Can only accept applications with 'Successful' status.");
-			return false;
-		}
-		// accept if successful status
-		selected.setStatus("Accepted");
-		this.internship = selected;
-
-		// withdraw all others by creating a new list
-		ApplicationRepo remaining = new ApplicationRepo();
-		remaining.add(selected);
-		this.applicationsList = remaining;
-
-		System.out.println("Internship accepted. Other applications withdrawn.");
-		return true;
-	}
-
-	public boolean withdrawInternship() {
-		if (this.internship == null) {
-			System.out.println("No accepted internship to withdraw.");
-			return false;
-		}
-
-		this.internship = null;
-
-		System.out.println("Your withdrawal request has been sent to the Career Center Staff");
 		return true;
 	}
 

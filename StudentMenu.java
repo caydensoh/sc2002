@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.*;
 
 public class StudentMenu extends Menu {
@@ -10,38 +11,16 @@ public class StudentMenu extends Menu {
         this.student = s;
         this.iRepo = r;
         this.aRepo = a;
+        optionMap.put("3", this::viewStudentApplications);
+        optionLabels.put("3", "View my applications");
+        optionMap.put("4", this::changeOwnPassword);
+        optionLabels.put("4", "Change password");
+        optionMap.put("5", this::manageFilterSettings);
+        optionLabels.put("5", "Manage filter settings");
     }
 
     @Override
-    public String displayGetChoices() {
-        System.out.println("\n========== Internship Management System (Student) ==========");
-        System.out.println("Logged in as: " + student.getName() + " (" + student.getUserID() + ")");
-        System.out.println("1: View my profile");
-        System.out.println("2: Browse internships");
-        System.out.println("3: View my applications");
-        System.out.println("4: Change my password");
-        System.out.println("5: Manage filter settings");
-        System.out.println("0: Logout");
-        System.out.println("====================================================");
-        System.out.print("Enter your choice: ");
-        String input = scanner.nextLine().trim();
-	    return input;
-    }
-
-    @Override
-    public void handleChoices(String choice) {
-        switch (choice) {
-            case "1" -> viewOwnProfile();
-            case "2" -> browseInternships();
-            case "3" -> viewStudentApplications();
-            case "4" -> changeOwnPassword();
-            case "5" -> manageFilterSettings();
-            case "0" -> logoutCurrentUser();
-            default -> System.out.println(choice);//"Invalid choice. Please try again.\n");
-        }
-    }
-
-    private void viewOwnProfile() {
+    protected void viewOwnProfile() {
         displayUserHeader();
         System.out.println("Type: Student");
         System.out.println("Year of Study: " + student.getYearOfStudy());
@@ -51,12 +30,16 @@ public class StudentMenu extends Menu {
         System.out.println("================================\n");
     }
 
-    private void browseInternships() {
+    @Override
+    protected void browseInternships() {
         System.out.println("\n========== Browse Internships ==========");
         FilterSetting filter = student.getFilterSettings();
 
-        List<Internship> filtered = new ArrayList<>();
+        InternshipRepo filtered = new InternshipRepo();
         for (Internship intern : iRepo.getAll()) {
+            // Students should only see Approved internships that match their filters
+            if (!"Approved".equals(intern.getStatus())) continue;
+            if (!intern.getVisibility()) continue;
             if (intern.matchesFilter(filter)) {
                 filtered.add(intern);
             }
@@ -78,10 +61,42 @@ public class StudentMenu extends Menu {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < filtered.size()) {
                 Internship selected = filtered.get(idx);
+
+                // Basic application eligibility checks
+                if (!"Approved".equals(selected.getStatus())) {
+                    System.out.println("Cannot apply: internship not approved.");
+                    return;
+                }
+                if (selected.getSlots() == null || selected.getSlots() <= 0) {
+                    System.out.println("Cannot apply: no available slots.");
+                    return;
+                }
+                if (selected.getClosingDate() != null && selected.getClosingDate().isBefore(LocalDate.now())) {
+                    System.out.println("Cannot apply: application period has closed.");
+                    return;
+                }
+                // Already applied check
+                for (Application existing : student.getApplications().getAll()) {
+                    if (existing.getInternship() != null && selected.getInternshipID().equals(existing.getInternship().getInternshipID())) {
+                        System.out.println("You have already applied to this internship.");
+                        return;
+                    }
+                }
+                // Accepted placement check
+                if (student.getAcceptedInternship() != null) {
+                    System.out.println("You have already accepted an internship and cannot apply to more.");
+                    return;
+                }
+
                 Application app = new Application(selected, null, null);
-                student.addApplication(app);
-                aRepo.add(app);
-                System.out.println("Application submitted!\n");
+                app.setStudent(student);
+                try {
+                    student.addApplication(app);
+                    aRepo.add(app);
+                    System.out.println("Application submitted!\n");
+                } catch (IllegalArgumentException | IllegalStateException e) {
+                    System.out.println("Failed to submit application: " + e.getMessage());
+                }
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.\n");
@@ -90,7 +105,7 @@ public class StudentMenu extends Menu {
 
     private void viewStudentApplications() {
         System.out.println("\n========== My Applications ==========");
-        List<Application> apps = student.getApplications();
+        ApplicationRepo apps = student.getApplications();
 
         if (apps == null || apps.isEmpty()) {
             System.out.println("No applications yet.\n");
@@ -102,19 +117,59 @@ public class StudentMenu extends Menu {
             System.out.println((i + 1) + ". " + app.getInternship().getTitle() +
                 " - Status: " + app.getStatus());
         }
-        
-        System.out.print("\nSelect application to remove (0 to cancel): ");
+        System.out.print("Select application: (1 to " + apps.size() + ", 0 to cancel): ");
         try {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < apps.size()) {
-                Boolean removed = student.removeApplication(idx);
-                if (removed) {
-                    System.out.println("Application removed successfully!\n");
-                } else {
-                    System.out.println("Failed to remove application.\n");
+                Application selected = apps.get(idx);
+                System.out.println("\n--- Application Details ---");
+                System.out.println("Internship: " + selected.getInternship().getTitle());
+                System.out.println("Company: " + selected.getInternship().getCompanyName());
+                System.out.println("Level: " + selected.getInternship().getInternshipLevel());
+                System.out.println("Status: " + selected.getStatus());
+                System.out.println("---------------------------\n");
+                System.out.println("1: Accept Internship (if Successful)");
+                System.out.println("2: Withdraw Application");
+                System.out.print("Enter choice (0 to cancel): ");
+                String action = scanner.nextLine().trim();
+                switch (action) {
+                    case "1" -> {
+                        if (!"Successful".equals(selected.getStatus())) {
+                            System.out.println("Can only accept applications with 'Successful' status.");
+                            return;
+                        }
+                        if (student.getAcceptedInternship() != null) {
+                            System.out.println("You have already accepted an internship.");
+                            return;
+                        }
+                        // Accept placement: record accepted application and withdraw others
+                        student.setAcceptedInternship(selected);
+                        Internship intern = selected.getInternship();
+                        // decrement slots and mark filled if needed
+                        if (intern.getSlots() != null) {
+                            intern.setSlots(intern.getSlots() - 1);
+                            if (intern.getSlots() <= 0) {
+                                intern.setStatus("Filled");
+                            }
+                        }
+                        // Withdraw other applications
+                        for (Application other : apps.getAll()) {
+                            if (other != selected) {
+                                other.setWithdrawalStatus("Withdrawn");
+                                other.setStatus("Unsuccessful");
+                            }
+                        }
+                        System.out.println("Internship accepted. Congratulations!\n");
+                    }
+                    case "2" -> {
+                        selected.setWithdrawalStatus("Pending");
+                        System.out.println("Your withdrawal request has been sent to the Career Center Staff");
+                    }
+                    case "0" -> {
+                        // Do nothing, just return
+                    }
+                    default -> System.out.println("Invalid choice.\n");
                 }
-            } else if (idx != -1) {
-                System.out.println("Invalid selection.\n");
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.\n");
@@ -135,6 +190,7 @@ public class StudentMenu extends Menu {
             System.out.println("  Title Keywords: " + (filter.getTitleKeywords() != null ? filter.getTitleKeywords() : "None"));
             System.out.println("  Description Keywords: " + (filter.getDescriptionKeywords() != null ? filter.getDescriptionKeywords() : "None"));
             System.out.println("  Company: " + (filter.getCompanyName() != null ? filter.getCompanyName() : "None"));
+            System.out.println(" Withdrawn Internships Hidden: " + filter.getWithdrawalHidden());
             System.out.println();
             System.out.println("1: Change title keywords filter");
             System.out.println("2: Change description keywords filter");

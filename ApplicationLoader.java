@@ -27,10 +27,11 @@ public class ApplicationLoader implements Loader {
                 String applicationID = parts[0].trim();
                 String internshipID = parts[1].trim();
                 String status = parts[2].trim();
+                String withdrawalStatus = parts.length > 3 ? parts[3].trim() : "Active";
 
                 Internship internship = findInternshipByID(internshipID);
                 if (internship != null) {
-                    Application app = new Application(internship, applicationID, status);
+                    Application app = new Application(internship, applicationID, status, withdrawalStatus);
                     applicationRepo.add(app);
                 }
             }
@@ -43,12 +44,13 @@ public class ApplicationLoader implements Loader {
     @Override
     public void save() {
         try (FileWriter fw = new FileWriter(CsvPaths.APPLICATIONS)) {
-            fw.write("ApplicationID,InternshipID,Status\n");
+            fw.write("ApplicationID,InternshipID,Status,WithdrawalStatus\n");
             for (Application app : applicationRepo.getAll()) {
-                String line = String.format("%s,%s,%s\n",
+                String line = String.format("%s,%s,%s,%s\n",
                     app.getApplicationID(),
                     app.getInternship().getInternshipID(),
-                    app.getStatus()
+                    app.getStatus(),
+                    app.getWithdrawalStatus() == null ? "Active" : app.getWithdrawalStatus()
                 );
                 fw.write(line);
             }

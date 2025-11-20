@@ -51,7 +51,7 @@ public abstract class User {
 
 	public FilterSetting getFilterSettings() {
 		if (this.FilterSettings == null) {
-			this.FilterSettings = new FilterSetting(null, null, null, null, null, null, false, false);
+			this.FilterSettings = new FilterSetting(null, null, null, null, null, null, false, false, false);
 		}
 		return this.FilterSettings;
 	}

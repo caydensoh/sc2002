@@ -13,7 +13,7 @@ INT011,Quality Assurance Tester,Software testing and automation,Basic,Software E
 INT012,Systems Administrator,Network and server management,Intermediate,Information Technology,2025-01-30,2025-03-10,Approved,NetWorks,C012,2,false
 INT013,Full Stack Developer,MERN stack development,Intermediate,Software Engineering,2025-02-05,2025-03-25,Approved,WebTech,C013,3,true
 INT014,Cybersecurity Analyst,Security threat analysis and response,Advanced,Information Technology,2025-02-12,2025-03-28,Pending,SecureNet,C014,1,true
-INT015,Business Analyst,Requirements gathering and analysis,Basic,Computer Science,2025-01-28,2025-03-05,Approved,ConultCorp,C015,4,true
+INT015,Business Analyst,Requirements gathering and analysis,Basic,Computer Science,2025-01-28,2025-03-05,Approved,DataSolutions,rep002,2,true
 INT016,API Developer,RESTful API design and implementation,Intermediate,Software Engineering,2025-02-08,2025-03-20,Approved,APIForce,C016,2,true
 INT017,Game Developer,Unity and Unreal game development,Advanced,Computer Science,2025-02-18,2025-04-10,Approved,GameStudio,C017,2,true
 INT018,Data Engineer,ETL pipeline development,Intermediate,Information Technology,2025-01-25,2025-03-15,Approved,DataPipe,C018,3,true

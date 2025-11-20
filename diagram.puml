@@ -1,0 +1,387 @@
+@startuml sc2002
+' Complete class diagram with base-level methods and key fields
+' Generated for sc2002 project
+
+' ---------- Entities / Domain ----------
+class User {
+  - String userID
+  - String name
+  - String password
+  - FilterSetting filterSettings
+  + User(String userID, String name, String password)
+  + String getUserID()
+  + String getName()
+  + String getPassword()
+  + boolean login(String password)
+  + boolean changePassword(String oldPass, String newPass)
+  + FilterSetting getFilterSettings()
+  + void setFilterSettings(FilterSetting)
+}
+
+class Student {
+  - Integer yearOfStudy
+  - String major
+  - ApplicationRepo applicationsList
+  - Application internship
+  + Student(String userID,String name,String password,Integer yearOfStudy,String major, FilterSetting filterSettings)
+  + Integer getYearOfStudy()
+  + void setYearOfStudy(Integer)
+  + String getMajor()
+  + void setMajor(String)
+  + ApplicationRepo getApplications()
+  + boolean addApplication(Application)
+  + boolean removeApplication(Integer)
+  + Application getAcceptedInternship()
+  + void setAcceptedInternship(Application)
+}
+
+class CompanyRepresentative {
+  - String companyName
+  - String department
+  - String position
+  - boolean approval
+  - InternshipRepo internships
+  - ApplicationRepo appRepo
+  - UserRepo userRepo
+  + CompanyRepresentative(String userID,String name,String password,String companyName,String department,String position, ApplicationRepo appRepo, UserRepo userRepo)
+  + CompanyRepresentative(String userID,String name,String password,String companyName,String department,String position)
+  + String getDepartment()
+  + void setDepartment(String)
+  + String getPosition()
+  + void setPosition(String)
+  + InternshipRepo getInternships()
+  + String getCompanyName()
+  + boolean getApproval()
+  + void setApproval(boolean)
+  + boolean addInternships(Internship)
+  + boolean deleteInternship(int)
+  + InternshipRepo getApprovedInternships()
+  + boolean checkIfInternshipFilled(Internship)
+  + ApplicationRepo getAppRepo()
+  + UserRepo getUserRepo()
+  + void displayProfile()
+}
+
+class CareerCenterStaff {
+  - String staffDepartment
+  + CareerCenterStaff(String userID, String name, String password, String department)
+  + String getStaffDepartment()
+  + void setStaffDepartment(String)
+  + void displayProfile()
+}
+
+class Internship {
+  - String internshipID
+  - String title
+  - String description
+  - String internshipLevel
+  - String preferredMajor
+  - java.time.LocalDate openingDate
+  - java.time.LocalDate closingDate
+  - String status
+  - String companyName
+  - String companyRepIC
+  - Integer slots
+  - boolean visibility
+  + Internship(String internshipId,String title,String description,String internshipLevel,String preferredMajor,java.time.LocalDate openingDate,java.time.LocalDate closingDate,String companyName,String companyRepIC,Integer slots)
+  + String getInternshipID()
+  + String getTitle()
+  + void setTitle(String)
+  + String getDescription()
+  + void setDescription(String)
+  + String getInternshipLevel()
+  + void setInternshipLevel(String)
+  + String getPreferredMajor()
+  + void setPreferredMajor(String)
+  + java.time.LocalDate getOpeningDate()
+  + void setOpeningDate(java.time.LocalDate)
+  + java.time.LocalDate getClosingDate()
+  + void setClosingDate(java.time.LocalDate)
+  + String getStatus()
+  + void setStatus(String)
+  + String getCompanyName()
+  + void setCompanyName(String)
+  + String getCompanyRepIC()
+  + void setCompanyRepIC(String)
+  + Integer getSlots()
+  + void setSlots(Integer)
+  + boolean getVisibility()
+  + void setVisibility(boolean)
+  + boolean matchesFilter(FilterSetting)
+}
+
+class Application {
+  - String applicationID
+  - Internship internship
+  - String status
+  - String withdrawalStatus
+  - Student student
+  + Application(Internship internship, String applicationID, String status)
+  + Application(Internship internship, String applicationID, String status, String withdrawalStatus)
+  + String getApplicationID()
+  + Internship getInternship()
+  + String getStatus()
+  + void setStatus(String)
+  + void setStudent(Student)
+  + Student getStudent()
+  + void setWithdrawalStatus(String)
+  + String getWithdrawalStatus()
+}
+
+class FilterSetting {
+  - String titleKeywords
+  - String descriptionKeywords
+  - String companyName
+  - List<String> internshipLevels
+  - List<String> preferredMajors
+  - Boolean showOnlyOpen
+  - Boolean showOnlyVisible
+  - Boolean withdrawalHidden
+  + FilterSetting(String titleKeywords, String descriptionKeywords, List<String> internshipLevels, List<String> preferredMajors, String companyName, String something, Boolean showOnlyOpen, Boolean showOnlyVisible, Boolean withdrawalHidden)
+  + getters/setters...
+}
+
+' ---------- Repositories ----------
+interface Repo<T> {
+  + void add(T)
+  + void remove(T)
+  + java.util.List<T> getAll()
+  + boolean isEmpty()
+  + int size()
+}
+
+class InternshipRepo {
+  - List<Internship> internships
+  + InternshipRepo()
+  + void add(Internship)
+  + void remove(Internship)
+  + Internship get(int)
+  + List<Internship> getAll()
+  + Internship find(String internshipID)
+  + boolean isEmpty()
+  + int size()
+}
+
+class ApplicationRepo {
+  - List<Application> applications
+  + ApplicationRepo()
+  + void add(Application)
+  + void remove(Application)
+  + Application get(int)
+  + List<Application> getAll()
+  + Application find(String applicationID)
+  + boolean isEmpty()
+  + int size()
+}
+
+class UserRepo {
+  - List<User> users
+  + UserRepo()
+  + void add(User)
+  + void remove(User)
+  + User get(int)
+  + List<User> getAll()
+  + User find(String userID)
+  + boolean isEmpty()
+  + int size()
+}
+
+' ---------- Loaders / Persistence ----------
+class CsvPaths {
+  + static final String STUDENT
+  + static final String STAFF
+  + static final String COMPANY_REP
+  + static final String INTERNSHIPS
+  + static final String APPLICATIONS
+  + static final String FILTERS
+}
+
+interface Loader {
+  + void load()
+  + void save()
+}
+
+class InternshipLoader {
+  - InternshipRepo internshipRepo
+  + InternshipLoader(InternshipRepo)
+  + void load()
+  + void save()
+}
+
+class ApplicationLoader {
+  - ApplicationRepo applicationRepo
+  - InternshipRepo internshipRepo
+  + ApplicationLoader(ApplicationRepo, InternshipRepo)
+  + void load()
+  + void save()
+}
+
+class UserLoader {
+  - UserRepo users
+  - ApplicationRepo applications
+  - InternshipRepo internships
+  + UserLoader(UserRepo, ApplicationRepo, InternshipRepo)
+  + void load()
+  + void save()
+}
+
+class FilterSettingsLoader {
+  - UserRepo users
+  + FilterSettingsLoader(UserRepo)
+  + void load()
+  + void save()
+}
+
+class DataManager {
+  - UserLoader userLoader
+  - InternshipLoader internshipLoader
+  - ApplicationLoader applicationLoader
+  - FilterSettingsLoader filterSettingsLoader
+  + DataManager(UserRepo, InternshipRepo, ApplicationRepo)
+  + void loadAllData()
+  + void saveAllData()
+}
+
+' ---------- Menus / Boundary ----------
+class Menu {
+  - Scanner scanner
+  - User currentUser
+  - Map<String,Runnable> optionMap
+  - Map<String,String> optionLabels
+  + Menu(Scanner s, User u)
+  + String displayGetChoices()
+  + void handleChoices(String)
+  + void changeOwnPassword()
+  + void logoutCurrentUser()
+  + void viewOwnProfile()
+  + void browseInternships()
+  + protected void displayUserHeader()
+}
+
+class StudentMenu {
+  - Student student
+  - InternshipRepo iRepo
+  - ApplicationRepo aRepo
+  + StudentMenu(Scanner, Student, InternshipRepo, ApplicationRepo)
+  + void viewOwnProfile()
+  + void browseInternships()
+  + void viewStudentApplications()
+  + void manageFilterSettings()
+}
+
+class CompanyRepMenu {
+  - CompanyRepresentative compRep
+  - InternshipRepo iRepo
+  - ApplicationRepo aRepo
+  - UserRepo userRepo
+  + CompanyRepMenu(Scanner, CompanyRepresentative, InternshipRepo, ApplicationRepo, UserRepo)
+  + void browseInternships()
+  + void viewOwnProfile()
+  + void createInternship()
+  + void manageInternships()
+  + void updateInternshipMenu(Internship)
+  + void approveRejectApplications()
+  + void processApplicationsForInternship(Internship)
+}
+
+class StaffMenu {
+  - CareerCenterStaff staff
+  - InternshipRepo internships
+  - ApplicationRepo applications
+  - UserRepo users
+  + StaffMenu(Scanner, CareerCenterStaff, InternshipRepo, ApplicationRepo, UserRepo)
+  + void viewOwnProfile()
+  + void browseInternships()
+  + void viewAllApplications()
+  + void approveRejectCompanyReps()
+  + void approveRejectInternshipsOpportunities()
+  + void generateInternshipReport()
+  + void approveRejectInternshipWithdrawals()
+}
+
+class LoginScreen {
+  - Scanner scanner
+  - UserRepo userRepo
+  + LoginScreen(Scanner, UserRepo)
+  + User login()
+  + User validate()
+}
+
+class MenuFactory {
+  + static Menu getMenuForUser(Scanner scanner, User user, InternshipRepo internships, ApplicationRepo applications, UserRepo users)
+}
+
+class AppController {
+  - Scanner scanner
+  - UserRepo users
+  - InternshipRepo internships
+  - ApplicationRepo applications
+  - User activeUser
+  + AppController(Scanner, UserRepo, InternshipRepo, ApplicationRepo)
+  + void start()
+  - void loginLoop()
+  - void menuLoop()
+}
+
+class UserApp {
+  + static void main(String[] args)
+}
+
+' ---------- Relationships ----------
+User <|-- Student
+User <|-- CompanyRepresentative
+User <|-- CareerCenterStaff
+
+Menu <|-- StudentMenu
+Menu <|-- CompanyRepMenu
+Menu <|-- StaffMenu
+
+Repo <|.. InternshipRepo
+Repo <|.. ApplicationRepo
+Repo <|.. UserRepo
+
+Loader <|.. InternshipLoader
+Loader <|.. ApplicationLoader
+Loader <|.. UserLoader
+Loader <|.. FilterSettingsLoader
+
+Student "1" o-- "*" Application : applicationsList
+Application "1" --> "1" Internship : internship
+Application "0..1" --> "1" Student : student
+CompanyRepresentative "1" o-- "*" Internship : internships
+
+InternshipRepo "1" o-- "*" Internship
+ApplicationRepo "1" o-- "*" Application
+UserRepo "1" o-- "*" User
+
+DataManager --> InternshipLoader
+DataManager --> ApplicationLoader
+DataManager --> UserLoader
+DataManager --> FilterSettingsLoader
+
+MenuFactory --> Menu
+AppController --> MenuFactory
+AppController --> User
+UserApp --> AppController
+AppController --> LoginScreen : uses
+LoginScreen --> UserRepo : uses
+
+UserLoader --> UserRepo
+UserLoader --> ApplicationRepo
+UserLoader --> InternshipRepo
+
+InternshipLoader --> InternshipRepo
+ApplicationLoader --> ApplicationRepo
+FilterSettingsLoader --> UserRepo
+
+' FilterSetting associations
+User "1" --> "1" FilterSetting : has
+Internship --> FilterSetting : matchesFilter(uses)
+
+CompanyRepMenu --> ApplicationRepo : uses
+CompanyRepMenu --> UserRepo : uses
+StudentMenu --> ApplicationRepo : uses
+StaffMenu --> ApplicationRepo : uses
+Menu --> User
+
+@enduml

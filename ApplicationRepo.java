@@ -8,6 +8,11 @@ public class ApplicationRepo implements Repo<Application> {
     }
 
     @Override
+    public Application get(int index) {
+        return this.applications.get(index);
+    }
+
+    @Override
     public List<Application> getAll() {
         return this.applications;
     }

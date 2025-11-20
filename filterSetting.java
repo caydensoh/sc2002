@@ -11,6 +11,7 @@ public class FilterSetting {
 	private String companyName;
 	private Boolean available;
 	private Boolean visibility;
+	private Boolean withdrawalHidden; //True if withdrawn internships are to be hidden
 
 	public String getTitleKeywords() {
 		return this.titleKeywords;
@@ -102,6 +103,14 @@ public class FilterSetting {
 		this.visibility = visibility;
 	}
 
+	public Boolean getWithdrawalHidden() {
+		return this.withdrawalHidden;
+	}
+
+	public void setWithdrawalHidden(Boolean withdrawalHidden) {
+		this.withdrawalHidden = withdrawalHidden;
+	}
+
 	/**
 	 * 
 	 * @param titleKeywords
@@ -110,7 +119,7 @@ public class FilterSetting {
 	 * @param preferredMajors
 	 * @param dateRange
 	 */
-	public FilterSetting(String titleKeywords, String descriptionKeywords, List<String> internshipLevels, List<String> preferredMajors, String status, String companyName, boolean available, boolean visibility) {
+	public FilterSetting(String titleKeywords, String descriptionKeywords, List<String> internshipLevels, List<String> preferredMajors, String status, String companyName, boolean available, boolean visibility, Boolean withdrawalHidden) {
 		// Initialize fields defensively
 		this.titleKeywords = titleKeywords;
 		this.descriptionKeywords = descriptionKeywords;
@@ -121,29 +130,11 @@ public class FilterSetting {
 		this.companyName = companyName;
 		this.available = available;
 		this.visibility = visibility;
+		this.withdrawalHidden = withdrawalHidden;
 	}
 
 	/**
 	 * Helper method to clear or modify filter settings
 	 * @param code 0 = clear all filters, 1 = set to available only, 2 = set to invisible only
 	 */
-	public void setAttribute(int code) {
-		switch (code) {
-			case 0: // Clear all filters
-				this.titleKeywords = null;
-				this.descriptionKeywords = null;
-				if (this.internshipLevels != null) this.internshipLevels.clear();
-				this.status = null;
-				this.companyName = null;
-				if (this.preferredMajors != null) this.preferredMajors.clear();
-				break;
-			case 1: // Set to available
-				this.available = true;
-				break;
-			case 2: // Set to invisible
-				this.visibility = false;
-				break;
-		}
-	}
-
 }

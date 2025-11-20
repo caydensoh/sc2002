@@ -11,6 +11,11 @@ public class UserRepo implements Repo<User> {
     }
 
     @Override
+    public User get(int index) {    
+        return this.users.get(index);
+    }
+
+    @Override
     public List<User> getAll() {
         return this.users;
     }

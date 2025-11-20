@@ -1,28 +1,68 @@
 
-import java.util.Scanner;
+import java.util.*;
 
 public class Menu {
-    protected Scanner scanner;
-    protected User currentUser;
+	protected Scanner scanner;
+	protected User currentUser;
+	protected Map<String, Runnable> optionMap = new LinkedHashMap<>();
+    protected Map<String, String> optionLabels = new LinkedHashMap<>();
 
-    public Menu(Scanner s, User u) {
-        this.scanner = s;
-        this.currentUser = u;
-    }
+	public Menu(Scanner s, User u) {
+		this.scanner = s;
+		this.currentUser = u;
+		optionMap.put("1", this::viewOwnProfile);
+		optionLabels.put("1", "View my profile");
+		optionMap.put("2", this::browseInternships);
+		optionLabels.put("2", "Browse internships");
+		optionMap.put("0", this::logoutCurrentUser);
+		optionLabels.put("0", "Logout");
+	}
 
-    public String displayGetChoices() {
-        return "";
-    }
+	public String displayGetChoices() {
+		ensureLogoutLast();
+		System.out.println("\n========== Internship Management System ==========");
+		System.out.println("Logged in as: " + currentUser.getName() + " (" + currentUser.getUserID() + ")");
+		for (Map.Entry<String, Runnable> entry : optionMap.entrySet()) {
+			String key = entry.getKey();
+			String label = optionLabels.get(key);
+			if (label == null) {
+				label = switch (key) {
+					default -> "Option " + key;
+				};
+			}
+			System.out.println(key + ": " + label);
+		}
+		System.out.println("====================================================");
+		System.out.print("Enter your choice: ");
+		return scanner.nextLine().trim();
+	}
 
-    public void handleChoices(String choice) {
-    }
+	// ts pmo frfr holy shit
+	private void ensureLogoutLast() {
+		if (optionMap.containsKey("0")) {
+			Runnable logout = optionMap.remove("0");
+			String lbl = optionLabels.remove("0");
+			optionMap.put("0", logout);
+			if (lbl != null) optionLabels.put("0", lbl);
+		}
+	}
 
-    protected void displayUserHeader() {
-        System.out.println("\n========== My Profile ==========");
-        System.out.println("ID: " + currentUser.getUserID());
-        System.out.println("Name: " + currentUser.getName());
-    }
-    protected void changeOwnPassword() {
+	public void handleChoices(String choice) {
+		Runnable action = optionMap.get(choice);
+		if (action != null) {
+			action.run();
+		} else {
+			System.out.println("Invalid choice. Please try again.\n");
+		}
+	}
+
+	protected void displayUserHeader() {
+		System.out.println("\n========== My Profile ==========");
+		System.out.println("ID: " + currentUser.getUserID());
+		System.out.println("Name: " + currentUser.getName());
+	}
+
+	protected void changeOwnPassword() {
 		System.out.print("Enter current password: ");
 		String oldPass = scanner.nextLine();
 		System.out.print("Enter new password: ");
@@ -45,5 +85,16 @@ public class Menu {
 	protected void logoutCurrentUser() {
 		System.out.println("You have been logged out.\n");
 		currentUser = null;
+	}
+
+	protected void viewOwnProfile() {
+		displayUserHeader();
+		System.out.println("Type: " + currentUser.getClass().getSimpleName());
+		System.out.println("================================\n");
+	}
+
+	protected void browseInternships() {
+		System.out.println("\n========== Browse Internships ==========");
+		System.out.println("(Generic view: internships would be listed here. Override for role-specific logic.)\n");
 	}
 }

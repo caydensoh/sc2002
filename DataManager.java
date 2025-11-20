@@ -7,7 +7,7 @@ public class DataManager {
 	public DataManager(UserRepo userRepo, InternshipRepo internshipRepo, ApplicationRepo applicationRepo) {
 		this.internshipLoader = new InternshipLoader(internshipRepo);
 		this.applicationLoader = new ApplicationLoader(applicationRepo, internshipRepo);
-		this.userLoader = new UserLoader(userRepo, applicationRepo);
+		this.userLoader = new UserLoader(userRepo, applicationRepo, internshipRepo);
 		this.filterSettingsLoader = new FilterSettingsLoader(userRepo);
 	}
 

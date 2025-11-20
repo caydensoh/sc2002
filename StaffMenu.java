@@ -11,57 +11,43 @@ public class StaffMenu extends Menu {
         this.internships = internshipRepo;
         this.applications = applicationRepo;
         this.users = users;
+        optionMap.put("3", this::approveRejectCompanyReps);
+        optionLabels.put("3", "Approve/Reject Company Representatives");
+        // Removed viewAllInternships, browseInternships is now the base method
+        optionMap.put("4", this::approveRejectInternshipsOpportunities);
+        optionLabels.put("4", "Approve/Reject Internships");
+        optionMap.put("5", this::generateInternshipReport);
+        optionLabels.put("5", "Generate internship report");
+        optionMap.put("6", this::viewAllApplications);
+        optionLabels.put("6", "View all applications");
+        optionMap.put("7", this::approveRejectInternshipWithdrawals);
+        optionLabels.put("7", "Approve/Reject Internship Withdrawals");
+        optionMap.put("8", this::changeOwnPassword);
+        optionLabels.put("8", "Change password");
     }
+
+    // ...existing code...
+
+    // ...existing code...
 
     @Override
-    public String displayGetChoices() {
-        System.out.println("\n========== Internship Management System (Staff) ==========");
-        System.out.println("Logged in as: " + staff.getName() + " (" + staff.getUserID() + ")");
-        System.out.println("1: View my profile");
-        System.out.println("2: Approve/Reject company representatives");
-        System.out.println("3: View all internships");
-        System.out.println("4: Approve/Reject internship opportunities");
-        System.out.println("5: Generate internship report");
-        System.out.println("6: View all applications");
-        System.out.println("7: Change my password");
-        System.out.println("0: Logout");
-        System.out.println("====================================================");
-        System.out.print("Enter your choice: ");
-        String input = scanner.nextLine().trim();
-        return input;
-    }
-
-    @Override
-    public void handleChoices(String choice) {
-        switch (choice) {
-            case "1" -> viewOwnProfile();
-            case "2" -> approveRejectCompanyReps();
-            case "3" -> viewAllInternships();
-            case "4" -> approveRejectInternships();
-            case "5" -> generateInternshipReport();
-            case "6" -> viewAllApplications();
-            case "7" -> changeOwnPassword();
-            case "0" -> logoutCurrentUser();
-            default -> System.out.println("Invalid choice. Please try again.\n");
-        }
-    }
-
-    private void viewOwnProfile() {
+    protected void viewOwnProfile() {
         displayUserHeader();
         System.out.println("Type: Career Center Staff");
         System.out.println("Department: " + staff.getStaffDepartment());
         System.out.println("================================\n");
     }
 
-    private void viewAllInternships() {
+    @Override
+    protected void browseInternships() {
         System.out.println("\n========== All Internships ==========");
-        if (internships.getAll().isEmpty()) {
+        if (internships.isEmpty()) {
             System.out.println("No internships available.\n");
             return;
         }
 
-        for (int i = 0; i < internships.getAll().size(); i++) {
-            Internship in = internships.getAll().get(i);
+        for (int i = 0; i < internships.size(); i++) {
+            Internship in = internships.get(i);
             System.out.println((i + 1) + ". " + in.getTitle() + " (" + in.getInternshipLevel() +
                 ") - " + in.getCompanyName() + " | Visibility: " + in.getVisibility());
         }
@@ -71,14 +57,14 @@ public class StaffMenu extends Menu {
     private void viewAllApplications() {
         System.out.println("\n========== All Applications ==========");
 
-        if (applications.getAll().isEmpty()) {
+        if (applications.isEmpty()) {
             System.out.println("No applications yet.\n");
             return;
         }
 
         // List all applications with index, student, and internship basic info
-        for (int i = 0; i < applications.getAll().size(); i++) {
-            Application app = applications.getAll().get(i);
+        for (int i = 0; i < applications.size(); i++) {
+            Application app = applications.get(i);
             Student student = app.getStudent();
             Internship internship = app.getInternship();
 
@@ -104,12 +90,12 @@ public class StaffMenu extends Menu {
                 break; // exit to previous menu
             }
 
-            if (choice < 1 || choice > applications.getAll().size()) {
+            if (choice < 1 || choice > applications.size()) {
                 System.out.println("Number out of range. Try again.");
                 continue;
             }
 
-            Application selected = applications.getAll().get(choice - 1);
+            Application selected = applications.get(choice - 1);
             Student student = selected.getStudent();
             Internship internship = selected.getInternship();
 
@@ -141,7 +127,7 @@ public class StaffMenu extends Menu {
         }
 
         for (int i = 0; i < pendingReps.size(); i++) {
-            CompanyRepresentative rep = (CompanyRepresentative) pendingReps.getAll().get(i);
+            CompanyRepresentative rep = (CompanyRepresentative) pendingReps.get(i);
             System.out.println((i + 1) + ". " + rep.getName() + " (" + rep.getCompanyName() + ")");
         }
 
@@ -149,7 +135,7 @@ public class StaffMenu extends Menu {
         try {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
             if (idx >= 0 && idx < pendingReps.size()) {
-                CompanyRepresentative selected = (CompanyRepresentative) pendingReps.getAll().get(idx);
+                CompanyRepresentative selected = (CompanyRepresentative) pendingReps.get(idx);
                 System.out.println("\n1: Approve");
                 System.out.println("2: Reject");
                 System.out.print("Choose action: ");
@@ -167,7 +153,7 @@ public class StaffMenu extends Menu {
         }
     }
 
-    private void approveRejectInternships() {
+    private void approveRejectInternshipsOpportunities() {
         System.out.println("\n========== Approve/Reject Internships ==========");
         java.util.List<Internship> pendingInternships = new java.util.ArrayList<>();
         for (Internship intern : internships.getAll()) {
@@ -200,7 +186,7 @@ public class StaffMenu extends Menu {
                     selected.setStatus("Approved");
                     System.out.println("Internship approved!\n");
                 } else if (action.equals("2")) {
-                    selected.setStatus("Approved");
+                    selected.setStatus("Rejected");
                     System.out.println("Internship rejected.\n");
                 }
             }
@@ -271,4 +257,45 @@ public class StaffMenu extends Menu {
 			System.out.println("Total matching internships: " + filtered.size() + "\n");
 		}
 	}
+
+    public void approveRejectInternshipWithdrawals() { 
+        //• Able to approve or reject student withdrawal requests (both before and after placement confirmation)
+        System.out.println("\n========== Manage Internship Withdrawals ==========");
+        ApplicationRepo pendingWithdrawals = new ApplicationRepo();
+        for (Application app : applications.getAll()) {
+            if (app.getWithdrawalStatus() != null && app.getWithdrawalStatus().equals("Pending")) {
+                pendingWithdrawals.add(app);
+            }
+        }
+        if (pendingWithdrawals.isEmpty()) {
+            System.out.println("No pending withdrawal requests.\n");
+            return;
+        }
+        for (int i = 0; i < pendingWithdrawals.size(); i++) {
+            Application app = pendingWithdrawals.get(i);
+            Student student = app.getStudent();
+            Internship internship = app.getInternship();
+            System.out.println((i + 1) + ". " + student.getName() + " (" + student.getUserID() + ") - " + internship.getTitle());
+        }
+        System.out.print("\nSelect application (0 to cancel): ");
+        try {
+            int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
+            if (idx >= 0 && idx < pendingWithdrawals.size()) {
+                Application selected = pendingWithdrawals.get(idx);
+                System.out.println("\n1: Approve Withdrawal");
+                System.out.println("2: Reject Withdrawal");
+                System.out.print("Choose action: ");
+                String action = scanner.nextLine().trim();
+                if (action.equals("1")) {
+                    selected.setWithdrawalStatus("Withdrawn");
+                    System.out.println("Withdrawal approved!\n");
+                } else if (action.equals("2")) {
+                    selected.setWithdrawalStatus("Active");
+                    System.out.println("Withdrawal rejected.\n");
+                }
+            }
+        } catch (NumberFormatException e) {
+            System.out.println("Invalid input.\n");
+        }
+    }
 }

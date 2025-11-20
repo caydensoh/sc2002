@@ -6,10 +6,15 @@ public class Application {
 	private Student student;
 
 	public Application(Internship internship, String applicationID, String status) {
+		this(internship, applicationID, status, "Active");
+	}
+
+	public Application(Internship internship, String applicationID, String status, String withdrawalStatus) {
 		// Constructor for loading from CSV with existing ID
 		this.applicationID = applicationID == null? java.util.UUID.randomUUID().toString():applicationID;
 		this.internship = internship;
 		this.status = status == null? "Pending":status;
+		this.withdrawalStatus = withdrawalStatus == null? "Active" : withdrawalStatus;
 	}
 
 	public String getApplicationID() {
