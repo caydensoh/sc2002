@@ -5,7 +5,7 @@ INT003,Data Analyst Intern,Work with big data technologies,Advanced,Information 
 INT004,Python Backend Engineer,Django/FastAPI backend development,Intermediate,Computer Science,2025-01-20,2025-03-01,Approved,CloudInnovate,C004,4,true
 INT005,Mobile App Developer,iOS and Android development,Advanced,Software Engineering,2025-02-01,2025-03-15,Approved,AppStudio,C005,2,true
 INT006,Database Administrator,SQL Server and NoSQL management,Intermediate,Information Technology,2025-01-25,2025-02-28,Approved,DataCorp,C006,3,true
-INT007,DevOps Engineer,Docker and Kubernetes deployment,Advanced,Computer Science,2025-02-10,2025-03-20,Pending,OpsClouds,C007,1,true
+INT007,DevOps Engineer,Docker and Kubernetes deployment,Advanced,Computer Science,2025-02-10,2025-03-20,Approved,OpsClouds,C007,1,true
 INT008,UI/UX Designer,User interface and experience design,Basic,Software Engineering,2025-01-18,2025-02-25,Approved,DesignHub,C008,3,false
 INT009,Cloud Solutions Architect,AWS and Azure cloud design,Advanced,Information Technology,2025-02-15,2025-04-01,Approved,CloudSys,C009,2,true
 INT010,Machine Learning Engineer,AI and ML model development,Advanced,Computer Science,2025-02-20,2025-03-30,Approved,AITech,C010,2,true
