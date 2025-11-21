@@ -1,4 +1,4 @@
 UserID,Name,Password,CompanyName,Department,Position,Approval
-rep001,John Tan,password123,TechCorp,Sales,Manager,false
-rep002,Alice Lim,password,DataSolutions,Marketing,Analyst,true
-rep003,Bob Lee,InnovateX,Engineering,Engineer,false,true
+rep001@e.ntu.edu.sg,John Tan,password123,TechCorp,Sales,Manager,false
+rep002@e.ntu.edu.sg,Alice Lim,password,DataSolutions,Marketing,Analyst,true
+rep003@e.ntu.edu.sg,Bob Lee,InnovateX,Engineering,Engineer,false,true

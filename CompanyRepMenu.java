@@ -54,16 +54,65 @@ public class CompanyRepMenu extends Menu {
         System.out.println("\n========== Create New Internship ==========");
         System.out.print("Title: ");
         String title = scanner.nextLine().trim();
+        while (title.isEmpty()) {
+            System.out.println("Title cannot be empty.");
+            System.out.print("Title: ");
+            title = scanner.nextLine().trim();
+        }
         System.out.print("Description: ");
         String description = scanner.nextLine().trim();
-        System.out.print("Level (Basic/Intermediate/Advanced): ");
-        String level = scanner.nextLine().trim();
+        while (description.isEmpty()) {
+            System.out.println("Description cannot be empty.");
+            System.out.print("Description: ");
+            description = scanner.nextLine().trim();
+        }
+        String level = "";
+        boolean validLevel = false;
+        while (!validLevel) {
+            System.out.print("Level (Basic/Intermediate/Advanced): ");
+            level = scanner.nextLine().trim();
+            String lowerLevel = level.toLowerCase();
+            if (lowerLevel.equals("basic") || lowerLevel.equals("intermediate") || lowerLevel.equals("advanced")) {
+                // Normalize capitalization for consistency
+                level = Character.toUpperCase(lowerLevel.charAt(0)) + lowerLevel.substring(1);
+                validLevel = true;
+            } else {
+                System.out.println("Level must be 'Basic', 'Intermediate', or 'Advanced'.");
+            }
+        }
         System.out.print("Preferred Major: ");
         String major = scanner.nextLine().trim();
-        System.out.print("Opening Date (YYYY-MM-DD): ");
-        LocalDate openDate = LocalDate.parse(scanner.nextLine().trim());
-        System.out.print("Closing Date (YYYY-MM-DD): ");
-        LocalDate closeDate = LocalDate.parse(scanner.nextLine().trim());
+        while (major.isEmpty()) {
+            System.out.println("Preferred Major cannot be empty.");
+            System.out.print("Preferred Major: ");
+            major = scanner.nextLine().trim();
+        }
+        LocalDate openDate = null;
+        while (openDate == null) {
+            System.out.print("Opening Date (YYYY-MM-DD): ");
+            String dateInput = scanner.nextLine().trim();
+            try {
+                openDate = LocalDate.parse(dateInput);
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            }
+        }
+
+        LocalDate closeDate = null;
+        while (closeDate == null) {
+            System.out.print("Closing Date (YYYY-MM-DD): ");
+            String dateInput = scanner.nextLine().trim();
+            try {
+                closeDate = LocalDate.parse(dateInput);
+                // Optional: ensure closeDate >= openDate
+                if (closeDate.isBefore(openDate)) {
+                    System.out.println("Closing date cannot be before opening date.");
+                    closeDate = null;
+                }
+            } catch (DateTimeParseException e) {
+                System.out.println("Invalid date format. Please use YYYY-MM-DD.");
+            }
+        }
         System.out.print("Number of Slots (1-10): ");
         Integer slots = null;
         while (slots == null || slots < 1 || slots > 10) {
@@ -87,7 +136,7 @@ public class CompanyRepMenu extends Menu {
         Boolean added = compRep.addInternships(intern);
         if (added) {
             // keep central internship repo in sync
-            if (iRepo != null) iRepo.add(intern);
+            if (iRepo != null) iRepo.add(intern); //hererer
             System.out.println("Internship created successfully!\n");
         } else {
             System.out.println("Failed to create internship.\n");
@@ -240,6 +289,7 @@ public class CompanyRepMenu extends Menu {
             System.out.println("No application repository available.");
             return;
         }
+
 
         System.out.println("\n=== Applications for: " + intern.getTitle() + " ===");
         boolean found = false;
