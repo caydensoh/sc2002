@@ -25,3 +25,10 @@ INT023,Software Architect,Software system design and planning,Advanced,Computer 
 INT024,Research Scientist,Applied research and development,Advanced,Software Engineering,2025-03-01,2025-04-30,Pending,ResearchLab,C024,2,false
 INT025,Technical Writer,Documentation and technical content,Basic,Information Technology,2025-02-03,2025-03-15,Approved,DocWrite,C025,4,true
 INT026,DevSecOps Engineer,Security and operations integration,Advanced,Computer Science,2025-02-28,2025-04-25,Approved,SecOps,C026,1,true
+INT027,DevSecOps Software Engineer,Frontend Engineer Intern,Basic,Computer Engineering,2025-02-28,2025-04-25,Approved,SecOps,C026,1,true
+INT028,DevSecOps Engineer,Backend Engineer Intern,Basic,Computer Engineering,2025-02-28,2025-12-25,Approved,SecOps,C026,1,true
+INT029,Software Engineer,Software infrastructure design,Basic,Computer Engineering,2025-02-10,2025-12-25,Approved,NetDesign,C022,3,true
+INT030,Software Architect,Software system design and planning,Basic,Computer Engineering,2025-02-25,2025-12-20,Approved,ArchCorp,C023,1,true
+INT031,Research Scientist,Applied research and development,Basic,Computer Engineering,2025-03-01,2025-12-30,Pending,ResearchLab,C024,2,true
+INT032,Software Writer,Documentation and technical content,Basic,Computer Engineering,2025-02-03,2025-03-15,Approved,DocWrite,C025,4,true
+INT033,DevSecOps Software Engineer,Security and operations integration,Basic,Computer Engineering,2025-02-28,2025-12-25,Approved,SecOps,C026,1,true
