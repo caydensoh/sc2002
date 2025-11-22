@@ -40,6 +40,18 @@ public class StudentMenu extends Menu {
             // Students should only see Approved internships that match their filters
             if (!"Approved".equals(intern.getStatus())) continue;
             if (!intern.getVisibility()) continue;
+            // Skip internships the student has already applied for (unless they withdrew)
+            boolean alreadyApplied = false;
+            if (student.getApplications() != null) {
+                for (Application a : student.getApplications().getAll()) {
+                    if (a.getInternship() != null && intern.getInternshipID().equals(a.getInternship().getInternshipID())
+                            && a.getWithdrawalStatus() != null && !"Withdrawn".equalsIgnoreCase(a.getWithdrawalStatus())) {
+                        alreadyApplied = true;
+                        break;
+                    }
+                }
+            }
+            if (alreadyApplied) continue;
             if (intern.matchesFilter(filter)) {
                 filtered.add(intern);
             }
@@ -50,10 +62,13 @@ public class StudentMenu extends Menu {
             return;
         }
 
+        // Sort alphabetically by title
+        filtered.getAll().sort(Comparator.comparing(Internship::getTitle, String.CASE_INSENSITIVE_ORDER));
         for (int i = 0; i < filtered.size(); i++) {
             Internship in = filtered.get(i);
+            String closing = in.getClosingDate() == null ? "N/A" : in.getClosingDate().toString();
             System.out.println((i + 1) + ". " + in.getTitle() + " (" + in.getInternshipLevel() +
-                ") - " + in.getCompanyName() + " | Slots: " + in.getSlots());
+                ") - " + in.getCompanyName() + " | Slots: " + in.getSlots() + " | Closes: " + closing);
         }
 
         System.out.print("\nSelect internship to apply (0 to cancel): ");
@@ -112,21 +127,36 @@ public class StudentMenu extends Menu {
             return;
         }
 
-        for (int i = 0; i < apps.size(); i++) {
-            Application app = apps.get(i);
+        // Exclude withdrawn applications from the shown list
+        java.util.List<Application> visibleApps = new ArrayList<>();
+        for (Application app : apps.getAll()) {
+            if (app.getWithdrawalStatus() == null || !"Withdrawn".equalsIgnoreCase(app.getWithdrawalStatus())) {
+                visibleApps.add(app);
+            }
+        }
+        if (visibleApps.isEmpty()) {
+            System.out.println("No applications to show.\n");
+            return;
+        }
+
+        for (int i = 0; i < visibleApps.size(); i++) {
+            Application app = visibleApps.get(i);
             System.out.println((i + 1) + ". " + app.getInternship().getTitle() +
                 " - Status: " + app.getStatus());
         }
-        System.out.print("Select application: (1 to " + apps.size() + ", 0 to cancel): ");
+        System.out.print("Select application: (1 to " + visibleApps.size() + ", 0 to cancel): ");
         try {
             int idx = Integer.parseInt(scanner.nextLine().trim()) - 1;
-            if (idx >= 0 && idx < apps.size()) {
-                Application selected = apps.get(idx);
+            if (idx >= 0 && idx < visibleApps.size()) {
+                Application selected = visibleApps.get(idx);
                 System.out.println("\n--- Application Details ---");
                 System.out.println("Internship: " + selected.getInternship().getTitle());
                 System.out.println("Company: " + selected.getInternship().getCompanyName());
                 System.out.println("Level: " + selected.getInternship().getInternshipLevel());
                 System.out.println("Status: " + selected.getStatus());
+                if (selected.getWithdrawalStatus() != null && !"Active".equalsIgnoreCase(selected.getWithdrawalStatus())) {
+                    System.out.println("Withdrawal Status: " + selected.getWithdrawalStatus());
+                }
                 System.out.println("---------------------------\n");
                 System.out.println("1: Accept Internship (if Successful)");
                 System.out.println("2: Withdraw Application");
@@ -195,7 +225,10 @@ public class StudentMenu extends Menu {
             System.out.println("1: Change title keywords filter");
             System.out.println("2: Change description keywords filter");
             System.out.println("3: Change company name filter");
-            System.out.println("4: Clear all filters");
+            System.out.println("4: Toggle hide withdrawn internships");
+            System.out.println("5: Set start date filter (YYYY-MM-DD)");
+            System.out.println("6: Set end date filter (YYYY-MM-DD)");
+            System.out.println("7: Clear all filters");
             System.out.println("0: Done");
             System.out.print("Enter choice: ");
 
@@ -220,9 +253,32 @@ public class StudentMenu extends Menu {
                     System.out.println("Company filter updated.\n");
                 }
                 case "4" -> {
+                    filter.setWithdrawalHidden(!Boolean.TRUE.equals(filter.getWithdrawalHidden()));
+                    System.out.println("Toggled hide withdrawn internships to: " + filter.getWithdrawalHidden() + "\n");
+                }
+                case "5" -> {
+                    System.out.print("Enter start date (YYYY-MM-DD) or blank to clear: ");
+                    String d = scanner.nextLine().trim();
+                    if (d.isEmpty()) filter.setFilterStartDate(null);
+                    else {
+                        try { filter.setFilterStartDate(LocalDate.parse(d)); } catch (Exception e) { System.out.println("Invalid date format."); }
+                    }
+                }
+                case "6" -> {
+                    System.out.print("Enter end date (YYYY-MM-DD) or blank to clear: ");
+                    String d = scanner.nextLine().trim();
+                    if (d.isEmpty()) filter.setFilterEndDate(null);
+                    else {
+                        try { filter.setFilterEndDate(LocalDate.parse(d)); } catch (Exception e) { System.out.println("Invalid date format."); }
+                    }
+                }
+                case "7" -> {
                     filter.setTitleKeywords(null);
                     filter.setDescriptionKeywords(null);
                     filter.setCompanyName(null);
+                    filter.setFilterStartDate(null);
+                    filter.setFilterEndDate(null);
+                    filter.setWithdrawalHidden(false);
                     System.out.println("All filters cleared.\n");
                 }
                 case "0" -> managing = false;

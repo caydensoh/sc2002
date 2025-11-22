@@ -46,7 +46,8 @@ public class LoginScreen {
 			// Check if company rep needs approval
 			if (user instanceof CompanyRepresentative rep) {
 				if (!rep.getApproval()) {
-					System.out.println("Your account is pending approval from Career Center Staff.\n");
+					System.out.println("Your account is pending approval from Career Center Staff.");
+					System.out.println("Login aborted. You have been logged out.\n");
 					return null;
 				}
 			}

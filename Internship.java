@@ -184,17 +184,23 @@ public class Internship {
 	}
 
 	public boolean matchesFilter(FilterSetting filter) {
-        // Visible
-        if (this.visibility != filter.getVisibility()) {
-            return false;
-        }
+		// Visibility (only check if filter specifies a preference)
+		if (filter.getVisibility() != null) {
+			if (this.visibility != filter.getVisibility()) return false;
+		}
 
-        // Avaliable
-        if (filter.getAvailable() != null && filter.getAvailable()) {
-            if (this.slots <= 0) {
-                return false;
-            }
-        }
+		// Available (only check if requested)
+		if (filter.getAvailable() != null && filter.getAvailable()) {
+			if (this.slots == null || this.slots <= 0) return false;
+		}
+
+		// Date range filtering: if user set start/end, ensure internship overlaps range
+		if (filter.getFilterStartDate() != null) {
+			if (this.closingDate != null && this.closingDate.isBefore(filter.getFilterStartDate())) return false;
+		}
+		if (filter.getFilterEndDate() != null) {
+			if (this.openingDate != null && this.openingDate.isAfter(filter.getFilterEndDate())) return false;
+		}
 
         // Match internship level(s) if filter specifies them
         if (filter.getInternshipLevels() != null && !filter.getInternshipLevels().isEmpty()) {

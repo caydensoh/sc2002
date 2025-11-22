@@ -1,3 +1,4 @@
+import java.time.LocalDate;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -12,6 +13,8 @@ public class FilterSetting {
 	private Boolean available;
 	private Boolean visibility;
 	private Boolean withdrawalHidden; //True if withdrawn internships are to be hidden
+	private LocalDate filterStartDate;
+	private LocalDate filterEndDate;
 
 	public String getTitleKeywords() {
 		return this.titleKeywords;
@@ -111,6 +114,22 @@ public class FilterSetting {
 		this.withdrawalHidden = withdrawalHidden;
 	}
 
+	public LocalDate getFilterStartDate() {
+		return this.filterStartDate;
+	}
+
+	public void setFilterStartDate(LocalDate d) {
+		this.filterStartDate = d;
+	}
+
+	public LocalDate getFilterEndDate() {
+		return this.filterEndDate;
+	}
+
+	public void setFilterEndDate(LocalDate d) {
+		this.filterEndDate = d;
+	}
+
 	/**
 	 * 
 	 * @param titleKeywords
@@ -131,6 +150,8 @@ public class FilterSetting {
 		this.available = available;
 		this.visibility = visibility;
 		this.withdrawalHidden = withdrawalHidden;
+		this.filterStartDate = null;
+		this.filterEndDate = null;
 	}
 
 	/**

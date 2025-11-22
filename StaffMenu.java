@@ -1,3 +1,6 @@
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
+import java.util.*;
 
 public class StaffMenu extends Menu {
     private final CareerCenterStaff staff;
@@ -24,6 +27,8 @@ public class StaffMenu extends Menu {
         optionLabels.put("7", "Approve/Reject Internship Withdrawals");
         optionMap.put("8", this::changeOwnPassword);
         optionLabels.put("8", "Change password");
+        optionMap.put("9", this::manageFilterSettings);
+        optionLabels.put("9", "Manage filter settings");
     }
 
     // ...existing code...
@@ -45,11 +50,19 @@ public class StaffMenu extends Menu {
             System.out.println("No internships available.\n");
             return;
         }
-
-        for (int i = 0; i < internships.size(); i++) {
-            Internship in = internships.get(i);
+        // Apply staff filter settings (if any)
+        FilterSetting fs = staff.getFilterSettings();
+        InternshipRepo toShow = new InternshipRepo();
+        for (Internship in : internships.getAll()) {
+            if (fs == null || in.matchesFilter(fs)) toShow.add(in);
+        }
+        // sort alphabetically
+        toShow.getAll().sort(Comparator.comparing(Internship::getTitle, String.CASE_INSENSITIVE_ORDER));
+        for (int i = 0; i < toShow.size(); i++) {
+            Internship in = toShow.get(i);
+            String closing = in.getClosingDate() == null ? "N/A" : in.getClosingDate().toString();
             System.out.println((i + 1) + ". " + in.getTitle() + " (" + in.getInternshipLevel() +
-                ") - " + in.getCompanyName() + " | Visibility: " + in.getVisibility());
+                ") - " + in.getCompanyName() + " | Visibility: " + in.getVisibility() + " | Closes: " + closing);
         }
         System.out.println();
     }
@@ -62,9 +75,15 @@ public class StaffMenu extends Menu {
             return;
         }
 
-        // List all applications with index, student, and internship basic info
-        for (int i = 0; i < applications.size(); i++) {
-            Application app = applications.get(i);
+        // List all applications with index, student, and internship basic info (exclude withdrawn)
+        java.util.List<Application> visibleApps = new ArrayList<>();
+        for (Application app : applications.getAll()) {
+            if (app.getWithdrawalStatus() == null || !"Withdrawn".equalsIgnoreCase(app.getWithdrawalStatus())) {
+                visibleApps.add(app);
+            }
+        }
+        for (int i = 0; i < visibleApps.size(); i++) {
+            Application app = visibleApps.get(i);
             Student student = app.getStudent();
             Internship internship = app.getInternship();
 
@@ -296,6 +315,125 @@ public class StaffMenu extends Menu {
             }
         } catch (NumberFormatException e) {
             System.out.println("Invalid input.\n");
+        }
+    }
+
+    private void manageFilterSettings() {
+        System.out.println("\n========== Filter Settings (Staff) ==========");
+        FilterSetting filter = staff.getFilterSettings();
+
+        boolean managing = true;
+        while (managing) {
+            System.out.println("Current filters:");
+            System.out.println("  Internship Levels: " + (filter.getInternshipLevels() != null && !filter.getInternshipLevels().isEmpty() ? 
+                String.join(", ", filter.getInternshipLevels()) : "None"));
+            System.out.println("  Preferred Majors: " + (filter.getPreferredMajors() != null && !filter.getPreferredMajors().isEmpty() ? 
+                String.join(", ", filter.getPreferredMajors()) : "None"));
+            System.out.println("  Title Keywords: " + (filter.getTitleKeywords() != null ? filter.getTitleKeywords() : "None"));
+            System.out.println("  Description Keywords: " + (filter.getDescriptionKeywords() != null ? filter.getDescriptionKeywords() : "None"));
+            System.out.println("  Company: " + (filter.getCompanyName() != null ? filter.getCompanyName() : "None"));
+            System.out.println("  Status: " + (filter.getStatus() != null ? filter.getStatus() : "Any"));
+            System.out.println("  Available only: " + Boolean.TRUE.equals(filter.getAvailable()));
+            System.out.println("  Visibility only: " + Boolean.TRUE.equals(filter.getVisibility()));
+            System.out.println("  Start Date: " + (filter.getFilterStartDate() == null ? "None" : filter.getFilterStartDate()));
+            System.out.println("  End Date: " + (filter.getFilterEndDate() == null ? "None" : filter.getFilterEndDate()));
+            System.out.println();
+            System.out.println("1: Change title keywords filter");
+            System.out.println("2: Change description keywords filter");
+            System.out.println("3: Change company name filter");
+            System.out.println("4: Set status filter (Approved/Rejected/Pending/All)");
+            System.out.println("5: Change internship levels (semicolon-separated)");
+            System.out.println("6: Change preferred majors (semicolon-separated)");
+            System.out.println("7: Toggle available-only");
+            System.out.println("8: Toggle visibility-only");
+            System.out.println("9: Set start date filter (YYYY-MM-DD)");
+            System.out.println("10: Set end date filter (YYYY-MM-DD)");
+            System.out.println("11: Clear all filters");
+            System.out.println("0: Done");
+            System.out.print("Enter choice: ");
+
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1" -> {
+                    System.out.print("Enter title keywords or leave blank to clear: ");
+                    String title = scanner.nextLine().trim();
+                    filter.setTitleKeywords(title.isEmpty() ? null : title);
+                    System.out.println("Title keywords filter updated.\n");
+                }
+                case "2" -> {
+                    System.out.print("Enter description keywords or leave blank to clear: ");
+                    String description = scanner.nextLine().trim();
+                    filter.setDescriptionKeywords(description.isEmpty() ? null : description);
+                    System.out.println("Description keywords filter updated.\n");
+                }
+                case "3" -> {
+                    System.out.print("Enter company name or leave blank to clear: ");
+                    String company = scanner.nextLine().trim();
+                    filter.setCompanyName(company.isEmpty() ? null : company);
+                    System.out.println("Company filter updated.\n");
+                }
+                case "4" -> {
+                    System.out.print("Enter status (Approved/Rejected/Pending) or leave blank to clear: ");
+                    String st = scanner.nextLine().trim();
+                    filter.setStatus(st.isEmpty() ? null : st);
+                    System.out.println("Status filter updated.\n");
+                }
+                case "5" -> {
+                    System.out.print("Enter internship levels separated by semicolon (e.g. Basic;Advanced) or leave blank to clear: ");
+                    String levels = scanner.nextLine().trim();
+                    filter.setInternshipLevels(levels.isEmpty() ? new ArrayList<>() : Arrays.asList(levels.split(";")));
+                    System.out.println("Internship levels updated.\n");
+                }
+                case "6" -> {
+                    System.out.print("Enter preferred majors separated by semicolon or leave blank to clear: ");
+                    String majors = scanner.nextLine().trim();
+                    filter.setPreferredMajors(majors.isEmpty() ? new ArrayList<>() : Arrays.asList(majors.split(";")));
+                    System.out.println("Preferred majors updated.\n");
+                }
+                case "7" -> {
+                    Boolean cur = filter.getAvailable();
+                    filter.setAvailable(cur == null ? true : !cur);
+                    System.out.println("Available-only toggled.\n");
+                }
+                case "8" -> {
+                    Boolean cur = filter.getVisibility();
+                    filter.setVisibility(cur == null ? true : !cur);
+                    System.out.println("Visibility-only toggled.\n");
+                }
+                case "9" -> {
+                    System.out.print("Enter start date (YYYY-MM-DD) or blank to clear: ");
+                    String d = scanner.nextLine().trim();
+                    if (d.isEmpty()) {
+                        filter.setFilterStartDate(null);
+                    } else {
+                        try { filter.setFilterStartDate(LocalDate.parse(d)); } catch (DateTimeParseException e) { System.out.println("Invalid date format."); }
+                    }
+                }
+                case "10" -> {
+                    System.out.print("Enter end date (YYYY-MM-DD) or blank to clear: ");
+                    String d = scanner.nextLine().trim();
+                    if (d.isEmpty()) {
+                        filter.setFilterEndDate(null);
+                    } else {
+                        try { filter.setFilterEndDate(LocalDate.parse(d)); } catch (DateTimeParseException e) { System.out.println("Invalid date format."); }
+                    }
+                }
+                case "11" -> {
+                    filter.setTitleKeywords(null);
+                    filter.setDescriptionKeywords(null);
+                    filter.setCompanyName(null);
+                    filter.setStatus(null);
+                    filter.setInternshipLevels(new ArrayList<>());
+                    filter.setPreferredMajors(new ArrayList<>());
+                    filter.setAvailable(false);
+                    filter.setVisibility(false);
+                    filter.setFilterStartDate(null);
+                    filter.setFilterEndDate(null);
+                    System.out.println("All filters cleared.\n");
+                }
+                case "0" -> managing = false;
+                default -> System.out.println("Invalid choice. Please try again.\n");
+            }
         }
     }
 }

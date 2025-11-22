@@ -22,6 +22,8 @@ public class CompanyRepMenu extends Menu {
         optionLabels.put("5", "Approve/Reject applications");
         optionMap.put("6", this::changeOwnPassword);
         optionLabels.put("6", "Change password");
+        optionMap.put("7", this::manageFilterSettings);
+        optionLabels.put("7", "Manage filter settings");
     }
 
     @Override
@@ -32,10 +34,13 @@ public class CompanyRepMenu extends Menu {
             System.out.println("No internships available.\n");
             return;
         }
+        // Sort and show closing dates
+        interns.getAll().sort(Comparator.comparing(Internship::getTitle, String.CASE_INSENSITIVE_ORDER));
         for (int i = 0; i < interns.size(); i++) {
             Internship in = interns.get(i);
+            String closing = in.getClosingDate() == null ? "N/A" : in.getClosingDate().toString();
             System.out.println((i + 1) + ". " + in.getTitle() + " (" + in.getInternshipLevel() +
-                ") - " + in.getCompanyName() + " | Slots: " + in.getSlots());
+                ") - " + in.getCompanyName() + " | Slots: " + in.getSlots() + " | Closes: " + closing);
         }
         System.out.println();
     }
@@ -113,20 +118,8 @@ public class CompanyRepMenu extends Menu {
                 System.out.println("Invalid date format. Please use YYYY-MM-DD.");
             }
         }
-        System.out.print("Number of Slots (1-10): ");
-        Integer slots = null;
-        while (slots == null || slots < 1 || slots > 10) {
-            System.out.print("Number of Slots (1-10): ");
-            try {
-                slots = Integer.valueOf(scanner.nextLine().trim());
-                if (slots < 1 || slots > 10) {
-                    System.out.println("Slots must be between 1 and 10.");
-                    slots = null;
-                }
-            } catch (NumberFormatException e) {
-                System.out.println("Please enter a valid number.");
-            }
-        }
+        // Read slots using helper to avoid duplicate prompts
+        Integer slots = readSlots();
 
         String internshipId = "INT-" + String.format("%03d", compRep.getInternships().size() + 1);
 
@@ -295,6 +288,7 @@ public class CompanyRepMenu extends Menu {
         boolean found = false;
 
         for (Application app : appRepoLocal.getAll()) {
+            if (app.getWithdrawalStatus() != null && "Withdrawn".equalsIgnoreCase(app.getWithdrawalStatus())) continue;
             if (intern.getInternshipID().equals(app.getInternship().getInternshipID())) {
                 Student student = null;
                 if (userRepo != null && app.getStudent() != null) {
@@ -350,6 +344,100 @@ public class CompanyRepMenu extends Menu {
 
         if (!found) {
             System.out.println("No applications found.");
+        }
+    }
+
+    private void manageFilterSettings() {
+        System.out.println("\n========== Filter Settings (Company Rep) ==========");
+        FilterSetting filter = compRep.getFilterSettings();
+
+        boolean managing = true;
+        while (managing) {
+            System.out.println("Current filters:");
+            System.out.println("  Internship Levels: " + (filter.getInternshipLevels() != null && !filter.getInternshipLevels().isEmpty() ? 
+                String.join(", ", filter.getInternshipLevels()) : "None"));
+            System.out.println("  Preferred Majors: " + (filter.getPreferredMajors() != null && !filter.getPreferredMajors().isEmpty() ? 
+                String.join(", ", filter.getPreferredMajors()) : "None"));
+            System.out.println("  Title Keywords: " + (filter.getTitleKeywords() != null ? filter.getTitleKeywords() : "None"));
+            System.out.println("  Description Keywords: " + (filter.getDescriptionKeywords() != null ? filter.getDescriptionKeywords() : "None"));
+            System.out.println("  Company: " + (filter.getCompanyName() != null ? filter.getCompanyName() : "None"));
+            System.out.println("  Start Date: " + (filter.getFilterStartDate() == null ? "None" : filter.getFilterStartDate()));
+            System.out.println("  End Date: " + (filter.getFilterEndDate() == null ? "None" : filter.getFilterEndDate()));
+            System.out.println();
+            System.out.println("1: Change title keywords filter");
+            System.out.println("2: Change description keywords filter");
+            System.out.println("3: Change company name filter");
+            System.out.println("4: Change internship levels (semicolon-separated)");
+            System.out.println("5: Change preferred majors (semicolon-separated)");
+            System.out.println("6: Set start date filter (YYYY-MM-DD)");
+            System.out.println("7: Set end date filter (YYYY-MM-DD)");
+            System.out.println("8: Clear all filters");
+            System.out.println("0: Done");
+            System.out.print("Enter choice: ");
+
+            String choice = scanner.nextLine().trim();
+            switch (choice) {
+                case "1" -> {
+                    System.out.print("Enter title keywords or leave blank to clear: ");
+                    String title = scanner.nextLine().trim();
+                    filter.setTitleKeywords(title.isEmpty() ? null : title);
+                    System.out.println("Title keywords filter updated.\n");
+                }
+                case "2" -> {
+                    System.out.print("Enter description keywords or leave blank to clear: ");
+                    String description = scanner.nextLine().trim();
+                    filter.setDescriptionKeywords(description.isEmpty() ? null : description);
+                    System.out.println("Description keywords filter updated.\n");
+                }
+                case "3" -> {
+                    System.out.print("Enter company name or leave blank to clear: ");
+                    String company = scanner.nextLine().trim();
+                    filter.setCompanyName(company.isEmpty() ? null : company);
+                    System.out.println("Company filter updated.\n");
+                }
+                case "4" -> {
+                    System.out.print("Enter internship levels separated by semicolon (e.g. Basic;Advanced) or leave blank to clear: ");
+                    String levels = scanner.nextLine().trim();
+                    filter.setInternshipLevels(levels.isEmpty() ? new ArrayList<>() : Arrays.asList(levels.split(";")));
+                    System.out.println("Internship levels updated.\n");
+                }
+                case "5" -> {
+                    System.out.print("Enter preferred majors separated by semicolon or leave blank to clear: ");
+                    String majors = scanner.nextLine().trim();
+                    filter.setPreferredMajors(majors.isEmpty() ? new ArrayList<>() : Arrays.asList(majors.split(";")));
+                    System.out.println("Preferred majors updated.\n");
+                }
+                case "6" -> {
+                    System.out.print("Enter start date (YYYY-MM-DD) or blank to clear: ");
+                    String d = scanner.nextLine().trim();
+                    if (d.isEmpty()) {
+                        filter.setFilterStartDate(null);
+                    } else {
+                        try { filter.setFilterStartDate(parseDate(d)); } catch (Exception e) { System.out.println("Invalid date format."); }
+                    }
+                }
+                case "7" -> {
+                    System.out.print("Enter end date (YYYY-MM-DD) or blank to clear: ");
+                    String d = scanner.nextLine().trim();
+                    if (d.isEmpty()) {
+                        filter.setFilterEndDate(null);
+                    } else {
+                        try { filter.setFilterEndDate(parseDate(d)); } catch (Exception e) { System.out.println("Invalid date format."); }
+                    }
+                }
+                case "8" -> {
+                    filter.setTitleKeywords(null);
+                    filter.setDescriptionKeywords(null);
+                    filter.setCompanyName(null);
+                    filter.setInternshipLevels(new ArrayList<>());
+                    filter.setPreferredMajors(new ArrayList<>());
+                    filter.setFilterStartDate(null);
+                    filter.setFilterEndDate(null);
+                    System.out.println("All filters cleared.\n");
+                }
+                case "0" -> managing = false;
+                default -> System.out.println("Invalid choice. Please try again.\n");
+            }
         }
     }
 

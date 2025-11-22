@@ -1,5 +1,7 @@
 import java.io.*;
 import java.nio.file.*;
+import java.time.LocalDate;
+import java.time.format.DateTimeParseException;
 import java.util.*;
 
 public class FilterSettingsLoader implements Loader {
@@ -18,7 +20,7 @@ public class FilterSettingsLoader implements Loader {
                 String line = lines.get(i).trim();
                 if (line.isEmpty()) continue;
                 String[] parts = line.split(",", -1); // Keep empty trailing fields
-                if (parts.length != 9) continue; // Skip rows with incorrect column count
+                if (parts.length < 10) continue; // Skip rows with incorrect column count (expect at least 10)
                 String studentID = parts[0].trim();
                 User u = findUserByID(studentID);
                 if (u instanceof Student s) {
@@ -34,7 +36,7 @@ public class FilterSettingsLoader implements Loader {
     @Override
     public void save() {
         try (FileWriter fw = new FileWriter(CsvPaths.FILTERS)) {
-            fw.write("StudentID,TitleKeywords,DescriptionKeywords,InternshipLevels,PreferredMajors,Status,CompanyName,Available,Visibility,WithdrawalHidden\n");
+            fw.write("StudentID,TitleKeywords,DescriptionKeywords,InternshipLevels,PreferredMajors,Status,CompanyName,Available,Visibility,WithdrawalHidden,StartDate,EndDate\n");
             for (User u : userRepo.getAll()) {
                 if (u instanceof Student s) {
                     FilterSetting fs = s.getFilterSettings();
@@ -54,22 +56,37 @@ public class FilterSettingsLoader implements Loader {
         String descriptionKeywords = parts[2].isEmpty() ? null : parts[2].trim();
         String internshipLevelsStr = parts[3].trim();
         String preferredMajorsStr = parts[4].trim();
-        String status = parts[5].isEmpty() ? null : parts[5].trim();
-        String companyName = parts[6].isEmpty() ? null : parts[6].trim();
-        boolean available = Boolean.parseBoolean(parts[7].trim());
-        boolean visibility = Boolean.parseBoolean(parts[8].trim());
-        boolean withdrawalHidden = parts[9].isEmpty() ? false : Boolean.parseBoolean(parts[9].trim());
+        String status = parts.length > 5 && parts[5].isEmpty() ? null : (parts.length > 5 ? parts[5].trim() : null);
+        String companyName = parts.length > 6 && parts[6].isEmpty() ? null : (parts.length > 6 ? parts[6].trim() : null);
+        Boolean available = null;
+        if (parts.length > 7 && !parts[7].isEmpty()) available = Boolean.parseBoolean(parts[7].trim());
+        Boolean visibility = null;
+        if (parts.length > 8 && !parts[8].isEmpty()) visibility = Boolean.parseBoolean(parts[8].trim());
+        Boolean withdrawalHidden = false;
+        if (parts.length > 9 && !parts[9].isEmpty()) withdrawalHidden = Boolean.parseBoolean(parts[9].trim());
 
         List<String> levels = internshipLevelsStr.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(internshipLevelsStr.split(";")));
         List<String> majors = preferredMajorsStr.isEmpty() ? new ArrayList<>() : new ArrayList<>(Arrays.asList(preferredMajorsStr.split(";")));
 
-        return new FilterSetting(titleKeywords, descriptionKeywords, levels, majors, status, companyName, available, visibility, withdrawalHidden);
+        FilterSetting fs = new FilterSetting(titleKeywords, descriptionKeywords, levels, majors, status, companyName, available == null ? false : available, visibility == null ? false : visibility, withdrawalHidden);
+
+        // optional start/end date columns
+        if (parts.length > 10 && !parts[10].isEmpty()) {
+            try { fs.setFilterStartDate(LocalDate.parse(parts[10].trim())); } catch (DateTimeParseException e) { /* ignore parse errors */ }
+        }
+        if (parts.length > 11 && !parts[11].isEmpty()) {
+            try { fs.setFilterEndDate(LocalDate.parse(parts[11].trim())); } catch (DateTimeParseException e) { /* ignore parse errors */ }
+        }
+
+        return fs;
     }
 
     private String formatFilterSetting(String studentID, FilterSetting fs) {
         String levels = fs.getInternshipLevels() != null ? String.join(";", fs.getInternshipLevels()) : "";
         String majors = fs.getPreferredMajors() != null ? String.join(";", fs.getPreferredMajors()) : "";
-        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
+        String start = fs.getFilterStartDate() == null ? "" : fs.getFilterStartDate().toString();
+        String end = fs.getFilterEndDate() == null ? "" : fs.getFilterEndDate().toString();
+        return String.format("%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s,%s\n",
             studentID,
             safe(fs.getTitleKeywords()),
             safe(fs.getDescriptionKeywords()),
@@ -79,7 +96,9 @@ public class FilterSettingsLoader implements Loader {
             safe(fs.getCompanyName()),
             fs.getAvailable(),
             fs.getVisibility(),
-            fs.getWithdrawalHidden()
+            fs.getWithdrawalHidden(),
+            start,
+            end
         );
     }
 
