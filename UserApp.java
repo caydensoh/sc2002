@@ -12,12 +12,19 @@ public class UserApp {
 		DataManager d = new DataManager(users, internships, applications);
 		d.loadAllData();
 
-		AppController appController = new AppController(scanner, users, internships, applications);
+		/*AppController appController = new AppController(scanner, users, internships, applications);
 		appController.start();
 
 		// Save all data before exit
 		d.saveAllData();
 		System.out.println("Exiting... All changes saved.");
-		scanner.close();	
+		scanner.close();	*/
+////////////////////////////////////////////////////////////
+		while (true) {
+            AppController appController = new AppController(scanner, users, internships, applications);
+            appController.start(); 
+            d.saveAllData();
+            System.out.println("All changes saved.");
+		}
 	}
 }

@@ -20,9 +20,11 @@ public class LoginScreen {
 					User user = validate();
 					if (user != null) return user;
 				}
-				case "2" -> { return null; }
+				//case "2" -> { return null; }
+				case "2" -> { System.exit(0); }
+				
 				default -> System.out.println("Invalid choice. Please try again.");
-			}
+			}//
 		}
 	}
 
