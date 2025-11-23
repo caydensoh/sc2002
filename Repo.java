@@ -1,6 +1,6 @@
 import java.util.List;
 
-public abstract interface Repo<T> {
+public interface Repo<T> {
 
     T get(int index);
 
