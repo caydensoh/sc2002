@@ -22,11 +22,9 @@ public class Internship {
 	 * @param preferredMajor
 	 * @param openingDate
 	 * @param closingDate
-	 * @param status
 	 * @param companyName
 	 * @param companyRepIC
 	 * @param slots
-	 * @param visibility
 	 */
 	public Internship(String internshipId, String title, String description, String internshipLevel, String preferredMajor, LocalDate openingDate, LocalDate closingDate, String companyName, String companyRepIC, Integer slots) {
 		this.internshipID = internshipId == null? java.util.UUID.randomUUID().toString():internshipId;

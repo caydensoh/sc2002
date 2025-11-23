@@ -22,7 +22,7 @@ public class FilterSetting {
 
 	/**
 	 * 
-	 * @param attribute
+	 * @param titleKeywords
 	 */
 	public void setTitleKeywords(String titleKeywords) {
 		this.titleKeywords = titleKeywords;
@@ -134,11 +134,15 @@ public class FilterSetting {
 	 * 
 	 * @param titleKeywords
 	 * @param descriptionKeywords
-	 * @param internshipLevel
+	 * @param internshipLevels
 	 * @param preferredMajors
-	 * @param dateRange
+	 * @param status
+	 * @param companyName
+	 * @param available
+	 * @param visibility
+	 * @param withdrawalHidden
 	 */
-	public FilterSetting(String titleKeywords, String descriptionKeywords, List<String> internshipLevels, List<String> preferredMajors, String status, String companyName, boolean available, boolean visibility, Boolean withdrawalHidden) {
+public FilterSetting(String titleKeywords, String descriptionKeywords, List<String> internshipLevels, List<String> preferredMajors, String status, String companyName, boolean available, boolean visibility, Boolean withdrawalHidden) {
 		// Initialize fields defensively
 		this.titleKeywords = titleKeywords;
 		this.descriptionKeywords = descriptionKeywords;
